@@ -1,24 +1,34 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
 
 export default class Demo extends Phaser.Scene {
   constructor() {
-    super('GameScene');
+    super("GameScene");
   }
 
-  preload() {
-    this.load.image('logo', 'assets/phaser3-logo.png');
-  }
+  preload = (): void => {
+    this.#preloadMapImages();
+  };
 
-  create() {
-    const logo = this.add.image(400, 70, 'logo');
+  create = (): void => {
+    this.#setupMap();
+  };
 
-    this.tweens.add({
-      targets: logo,
-      y: 350,
-      duration: 1500,
-      ease: 'Sine.inOut',
-      yoyo: true,
-      repeat: -1
-    });
-  }
+  update() {}
+
+  // Private fields
+
+  /**
+   * This method handles images loading at game creation.
+   */
+  #preloadMapImages = (): void => {
+    this.load.image("background", "assets/images/background.png");
+  };
+  
+  /**
+   * This method handles background and map creation.
+   */
+  #setupMap = (): void => {
+    // Add background to displayed images.
+    this.add.image(0, 0, "background").setOrigin(0, 0).setScrollFactor(0, 0);
+  };
 }

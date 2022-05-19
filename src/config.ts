@@ -3,11 +3,17 @@ import Phaser from 'phaser';
 export default {
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#33A5E7',
   scale: {
-    width: 800,
-    height: 600,
+    width: 1024,
+    height: 768,
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  physics:{
+    default: 'arcade',
+    arcade:{
+      gravity: { y:1200},
+      debug: false
+    }
   }
 };
