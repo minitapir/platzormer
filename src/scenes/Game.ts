@@ -123,6 +123,11 @@ export default class GameScene extends Phaser.Scene {
       })[0] as Phaser.GameObjects.GameObject;
       this.spikes.add(spikeObject);
     });
+
+    // Background objects
+    for (let i = 3; i > 0; i--) {
+      this.map.createLayer("backgroundlayer" + i, tileset);
+    }
   };
 
   private setupPlayer = (): void => {
