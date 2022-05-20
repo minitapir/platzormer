@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="3">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="6">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
@@ -286,8 +286,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="12" name="Spikes">
+ <objectgroup id="12" name="spikes">
   <object id="1" name="Spike1" gid="197" x="64" y="3776" width="32" height="32"/>
   <object id="2" name="Spike2" gid="197" x="64.3333" y="3744.33" width="32" height="32"/>
+  <object id="3" name="spike0" gid="197" x="219" y="4255" width="44" height="40" rotation="-90"/>
  </objectgroup>
 </map>

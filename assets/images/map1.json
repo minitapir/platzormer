@@ -299,7 +299,7 @@
         {
          "draworder":"topdown",
          "id":12,
-         "name":"Spikes",
+         "name":"spikes",
          "objects":[
                 {
                  "gid":197,
@@ -324,6 +324,18 @@
                  "width":32,
                  "x":64.3333,
                  "y":3744.33
+                }, 
+                {
+                 "gid":197,
+                 "height":40,
+                 "id":3,
+                 "name":"spike0",
+                 "rotation":-90,
+                 "type":"",
+                 "visible":true,
+                 "width":44,
+                 "x":219,
+                 "y":4255
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -331,8 +343,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":13,
- "nextobjectid":3,
+ "nextlayerid":14,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.8.5",

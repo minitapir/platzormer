@@ -19,6 +19,7 @@ export default class GameScene extends Phaser.Scene {
   private map: Tilemaps.Tilemap | undefined;
   private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   private colliders: Collider[];
+  private spikes!: Phaser.Physics.Arcade.Group;
 
   // Control variables
   private speed: integer;
@@ -78,6 +79,10 @@ export default class GameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/images/map1.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
+    this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
     this.load.spritesheet("player", "assets/images/charac.png", {
       frameWidth: 32,
       frameHeight: 64,
@@ -92,6 +97,7 @@ export default class GameScene extends Phaser.Scene {
     this.map = this.make.tilemap({ key: "map" }) as Tilemaps.Tilemap;
     let tileset = this.map.addTilesetImage("tileset", "tiles");
 
+    // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
     ground.layer.setCollisionByExclusion([-1]);
 
@@ -103,6 +109,20 @@ export default class GameScene extends Phaser.Scene {
 
     this.colliders.push(ground);
     this.colliders.push(wall);
+
+    // Game Objects
+    this.spikes = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    this.map.getObjectLayer("spikes").objects.forEach((spike) => {
+      const spikeObject = this.map?.createFromObjects("spikes", {
+        key: "tilesetSprite",
+        name: spike.name,
+        frame: 196,
+      })[0] as Phaser.GameObjects.GameObject;
+      this.spikes.add(spikeObject);
+    });
   };
 
   private setupPlayer = (): void => {
@@ -112,6 +132,15 @@ export default class GameScene extends Phaser.Scene {
     this.colliders.forEach((collider) => {
       this.physics.add.collider(this.player, collider.layer, collider.behavior);
     });
+
+    // Game Objects
+    this.physics.add.collider(
+      this.player,
+      this.spikes,
+      this.playerHit,
+      undefined,
+      this
+    );
 
     // Animations
     const characters = ["yellow", "purple", "blue"];
@@ -173,6 +202,21 @@ export default class GameScene extends Phaser.Scene {
       //lorsque la touche Z n'est plus appuyée, alors il remplit une des conditions pour sauter de nouveau
       this.canJump = true;
     }
+  };
+
+  private playerHit = (): void => {
+    this.currentAbility = 0;
+    this.player.setVelocity(0, 0);
+    this.player.setX(64);
+    this.player.setY(4000);
+    this.player.setAlpha(0);
+    this.tweens.add({
+      targets: this.player,
+      alpha: 1,
+      duration: 100,
+      ease: "Linear",
+      repeat: 5,
+    });
   };
 
   private wallClimb = (): void => {
