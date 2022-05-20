@@ -20,6 +20,7 @@ export default class GameScene extends Phaser.Scene {
   private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   private colliders: Collider[];
   private spikes!: Phaser.Physics.Arcade.Group;
+  private winFlags!: Phaser.Physics.Arcade.Group;
 
   // Control variables
   private speed: integer;
@@ -110,7 +111,13 @@ export default class GameScene extends Phaser.Scene {
     this.colliders.push(ground);
     this.colliders.push(wall);
 
+    // Background objects
+    for (let i = 3; i > 0; i--) {
+      this.map.createLayer("backgroundlayer" + i, tileset);
+    }
+
     // Game Objects
+    // Spikes
     this.spikes = this.physics.add.group({
       allowGravity: false,
       immovable: true,
@@ -124,10 +131,19 @@ export default class GameScene extends Phaser.Scene {
       this.spikes.add(spikeObject);
     });
 
-    // Background objects
-    for (let i = 3; i > 0; i--) {
-      this.map.createLayer("backgroundlayer" + i, tileset);
-    }
+    // Win Flags
+    this.winFlags = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    this.map.getObjectLayer("winFlags").objects.forEach((winFlag) => {
+      const winFlagObject = this.map?.createFromObjects("winFlags", {
+        key: "tilesetSprite",
+        name: winFlag.name,
+        frame: 203,
+      })[0] as Phaser.GameObjects.GameObject;
+      this.winFlags.add(winFlagObject);
+    });
   };
 
   private setupPlayer = (): void => {
@@ -139,9 +155,20 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Game Objects
+
+    // Spikes
     this.physics.add.collider(
       this.player,
       this.spikes,
+      this.playerHit,
+      undefined,
+      this
+    );
+
+    // Win flags
+    this.physics.add.collider(
+      this.player,
+      this.winFlags,
       this.playerHit,
       undefined,
       this
