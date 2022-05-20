@@ -17,6 +17,12 @@ export default class GameScene extends Phaser.Scene {
   private jumpMax: integer;
   private jumpStrength: integer;
 
+  // Abilities variables
+  private abilitiesCount: integer;
+  private currentAbility: integer;
+  private abilityChangeDelay: integer;
+  private timeSinceLastAbilityChange: number;
+
   private getControl = (name: string): Control | undefined => {
     return this.controls.find((control) => control.name === name);
   };
@@ -29,6 +35,10 @@ export default class GameScene extends Phaser.Scene {
     this.canJump = true;
     this.jumpMax = 2;
     this.currentJumpCount = this.jumpMax;
+    this.abilitiesCount = 3;
+    this.currentAbility = 0;
+    this.abilityChangeDelay = 1000;
+    this.timeSinceLastAbilityChange = 0;
   }
 
   preload = (): void => {
@@ -41,9 +51,10 @@ export default class GameScene extends Phaser.Scene {
     this.setupCamera();
   };
 
-  update = (): void => {
+  update = (time: number, delta: number): void => {
     this.setVelocity();
     this.handleJump();
+    this.handleAbility(delta);
   };
 
   // Private fields
@@ -147,6 +158,44 @@ export default class GameScene extends Phaser.Scene {
     if (this.getControl("jump")?.control.isUp) {
       //lorsque la touche Z n'est plus appuyée, alors il remplit une des conditions pour sauter de nouveau
       this.canJump = true;
+    }
+  };
+
+  private nextAbility = () => {
+    if (this.timeSinceLastAbilityChange >= this.abilityChangeDelay) {
+      if (this.currentAbility === this.abilitiesCount) {
+        this.currentAbility = 0;
+      } else {
+        this.currentAbility++;
+      }
+      this.timeSinceLastAbilityChange = 0;
+    }
+  };
+
+  private handleAbility = (delta: number): void => {
+    this.timeSinceLastAbilityChange += delta;
+    if (this.getControl("action")?.control.isDown) {
+      this.nextAbility();
+    }
+
+    if (this.currentAbility === 0) {
+      this.player.anims.play("yellow");
+    }
+
+    if (this.currentAbility === 1) {
+      this.player.anims.play("blue");
+
+      this.speed = 500;
+      this.jumpMax = 2;
+      this.jumpStrength = 500;
+    } else {
+      this.speed = 300;
+      this.jumpMax = 1;
+      this.jumpStrength = 450;
+    }
+
+    if (this.currentAbility === 2) {
+      this.player.anims.play("purple");
     }
   };
 }
