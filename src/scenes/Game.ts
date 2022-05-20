@@ -5,13 +5,24 @@ export interface Control {
   control: Phaser.Input.Keyboard.Key;
 }
 
+export class Collider {
+  layer: Tilemaps.TilemapLayer;
+  behavior: () => void;
+  constructor(layer: Tilemaps.TilemapLayer, behavior: () => void = () => {}) {
+    this.layer = layer;
+    this.behavior = behavior;
+  }
+}
+
 export default class GameScene extends Phaser.Scene {
-  private speed: integer;
+  // Global scene variables
   private map: Tilemaps.Tilemap | undefined;
   private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  private controls: Control[];
+  private colliders: Collider[];
 
   // Control variables
+  private speed: integer;
+  private controls: Control[];
   private canJump: boolean;
   private currentJumpCount: integer;
   private jumpMax: integer;
@@ -30,6 +41,7 @@ export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
     this.controls = [];
+    this.colliders = [];
     this.speed = 300;
     this.jumpStrength = 450;
     this.canJump = true;
@@ -46,8 +58,8 @@ export default class GameScene extends Phaser.Scene {
   };
 
   create = (): void => {
-    let colliders = this.setupMap();
-    this.setupPlayer(colliders);
+    this.setupMap();
+    this.setupPlayer();
     this.setupCamera();
   };
 
@@ -75,29 +87,31 @@ export default class GameScene extends Phaser.Scene {
   /**
    * This method handles background and map creation.
    */
-  private setupMap = (): Tilemaps.TilemapLayer[] => {
-    let colliders = [];
+  private setupMap = (): void => {
     this.add.image(0, 0, "background").setOrigin(0, 0).setScrollFactor(0, 0);
     this.map = this.make.tilemap({ key: "map" }) as Tilemaps.Tilemap;
     let tileset = this.map.addTilesetImage("tileset", "tiles");
 
-    const ground = this.map.createLayer("ground", tileset);
-    ground.setCollisionByExclusion([-1]);
+    const ground = new Collider(this.map.createLayer("ground", tileset));
+    ground.layer.setCollisionByExclusion([-1]);
 
-    const wall = this.map.createLayer("wall", tileset);
-    wall.setCollisionByExclusion([-1]);
-    colliders.push(ground);
-    colliders.push(wall);
-    return colliders;
+    const wall = new Collider(
+      this.map.createLayer("wall", tileset),
+      this.wallClimb
+    );
+    wall.layer.setCollisionByExclusion([-1]);
+
+    this.colliders.push(ground);
+    this.colliders.push(wall);
   };
 
-  private setupPlayer = (colliders: Tilemaps.TilemapLayer[]): void => {
+  private setupPlayer = (): void => {
     this.player = this.physics.add.sprite(64, 4000, "player").setOrigin(0, 0);
 
     // Colliders
-    colliders.forEach((collider) =>
-      this.physics.add.collider(this.player, collider)
-    );
+    this.colliders.forEach((collider) => {
+      this.physics.add.collider(this.player, collider.layer, collider.behavior);
+    });
 
     // Animations
     const characters = ["yellow", "purple", "blue"];
@@ -161,12 +175,25 @@ export default class GameScene extends Phaser.Scene {
     }
   };
 
+  private wallClimb = (): void => {
+    this.currentJumpCount = 0;
+    if (this.currentAbility === 0 || this.currentAbility === 3) {
+      if (
+        this.getControl("left")?.control.isDown ||
+        this.getControl("right")?.control.isDown
+      ) {
+        if (this.player.body.blocked.left || this.player.body.blocked.right) {
+          this.player.setVelocityY(-this.speed);
+        }
+      }
+    }
+  };
+
   private nextAbility = () => {
     if (this.timeSinceLastAbilityChange >= this.abilityChangeDelay) {
+      this.currentAbility++;
       if (this.currentAbility === this.abilitiesCount) {
         this.currentAbility = 0;
-      } else {
-        this.currentAbility++;
       }
       this.timeSinceLastAbilityChange = 0;
     }
