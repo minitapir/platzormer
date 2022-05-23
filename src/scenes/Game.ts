@@ -1,4 +1,4 @@
-import Phaser, { Tilemaps } from "phaser";
+import Phaser, { GameObjects, Tilemaps } from "phaser";
 
 export interface Control {
   name: string;
@@ -21,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
   private colliders: Collider[];
   private spikes!: Phaser.Physics.Arcade.Group;
   private winFlags!: Phaser.Physics.Arcade.Group;
+  private arrowWalls!: Phaser.Physics.Arcade.Group;
+  private arrows!: Phaser.Physics.Arcade.Group;
 
   // Control variables
   private speed: integer;
@@ -35,6 +37,11 @@ export default class GameScene extends Phaser.Scene {
   private currentAbility: integer;
   private abilityChangeDelay: integer;
   private timeSinceLastAbilityChange: number;
+
+  // Enemies variables
+  private arrowSpeed: number;
+  private timeSinceLastArrowFired: number;
+  private arrowSpawnDelay: number;
 
   private getControl = (name: string): Control | undefined => {
     return this.controls.find((control) => control.name === name);
@@ -53,6 +60,9 @@ export default class GameScene extends Phaser.Scene {
     this.currentAbility = 0;
     this.abilityChangeDelay = 1000;
     this.timeSinceLastAbilityChange = 0;
+    this.timeSinceLastArrowFired = 0;
+    this.arrowSpawnDelay = 1000;
+    this.arrowSpeed = 400;
   }
 
   preload = (): void => {
@@ -69,6 +79,8 @@ export default class GameScene extends Phaser.Scene {
     this.setVelocity();
     this.handleJump();
     this.handleAbility(delta);
+    this.fireArrows(delta);
+    this.moveArrows();
   };
 
   // Private fields
@@ -80,6 +92,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/images/map1.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
+    this.load.image("arrow", "assets/images/arrow.png");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -102,6 +115,7 @@ export default class GameScene extends Phaser.Scene {
     const ground = new Collider(this.map.createLayer("ground", tileset));
     ground.layer.setCollisionByExclusion([-1]);
 
+    // Climbable walls
     const wall = new Collider(
       this.map.createLayer("wall", tileset),
       this.wallClimb
@@ -117,6 +131,27 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Game Objects
+
+    // Arrow walls
+    this.arrowWalls = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    this.map.getObjectLayer("arrowWalls").objects.forEach((arrowWall) => {
+      const arrowWallObject = this.map?.createFromObjects("arrowWalls", {
+        key: "tilesetSprite",
+        id: arrowWall.id,
+        frame: 64,
+      })[0] as Phaser.GameObjects.GameObject;
+      this.arrowWalls.add(arrowWallObject);
+    });
+
+    // Arrows (yet to be spawned)
+    this.arrows = this.physics.add.group({
+      allowGravity: false,
+      immovable: false,
+    });
+
     // Spikes
     this.spikes = this.physics.add.group({
       allowGravity: false,
@@ -125,7 +160,7 @@ export default class GameScene extends Phaser.Scene {
     this.map.getObjectLayer("spikes").objects.forEach((spike) => {
       const spikeObject = this.map?.createFromObjects("spikes", {
         key: "tilesetSprite",
-        name: spike.name,
+        id: spike.id,
         frame: 196,
       })[0] as Phaser.GameObjects.GameObject;
       this.spikes.add(spikeObject);
@@ -139,7 +174,7 @@ export default class GameScene extends Phaser.Scene {
     this.map.getObjectLayer("winFlags").objects.forEach((winFlag) => {
       const winFlagObject = this.map?.createFromObjects("winFlags", {
         key: "tilesetSprite",
-        name: winFlag.name,
+        id: winFlag.id,
         frame: 203,
       })[0] as Phaser.GameObjects.GameObject;
       this.winFlags.add(winFlagObject);
@@ -147,32 +182,32 @@ export default class GameScene extends Phaser.Scene {
   };
 
   private setupPlayer = (): void => {
-    this.player = this.physics.add.sprite(64, 4000, "player").setOrigin(0, 0);
+    this.player = this.physics.add.sprite(64, 4064, "player").setOrigin(0, 0);
 
     // Colliders
     this.colliders.forEach((collider) => {
       this.physics.add.collider(this.player, collider.layer, collider.behavior);
+      this.physics.add.collider(
+        this.arrows,
+        collider.layer,
+        (collider, collided) => {
+          collider.destroy();
+        }
+      );
     });
 
     // Game Objects
+    // Arrow walls
+    this.physics.add.collider(this.player, this.arrowWalls);
 
     // Spikes
-    this.physics.add.collider(
-      this.player,
-      this.spikes,
-      this.playerHit,
-      undefined,
-      this
-    );
+    this.physics.add.collider(this.player, this.spikes, this.playerHit);
+
+    // Arrows
+    this.physics.add.collider(this.player, this.arrows, this.playerHit);
 
     // Win flags
-    this.physics.add.collider(
-      this.player,
-      this.winFlags,
-      this.playerHit,
-      undefined,
-      this
-    );
+    this.physics.add.collider(this.player, this.winFlags, this.playerHit);
 
     // Animations
     const characters = ["yellow", "purple", "blue"];
@@ -236,6 +271,36 @@ export default class GameScene extends Phaser.Scene {
     }
   };
 
+  /**
+   * When player has the same Y position as an arrow wall
+   * Trigger an arrow.
+   */
+  private fireArrows = (delta: number): void => {
+    if (this.timeSinceLastArrowFired >= this.arrowSpawnDelay) {
+      this.arrowWalls.children.getArray().forEach((wall) => {
+        const playerY = Math.round(this.player.y) + 64;
+        const wallY = Math.round(wall.y);
+        if (playerY >= wallY && playerY <= wallY + 32) {
+          this.arrows.get(wall.x + 32, wallY, "arrow");
+        }
+      });
+      this.timeSinceLastArrowFired = 0;
+    }
+    this.timeSinceLastArrowFired += delta;
+  };
+
+  /**
+   * TODO : implement fire arrow to the left or right, defining it at spawn
+   */
+  private moveArrows = (): void => {
+    this.arrows.children.getArray().forEach((arrow) => {
+      arrow.setVelocityX(this.arrowSpeed);
+    });
+  };
+
+  /**
+   * When player is hit, reset.
+   */
   private playerHit = (): void => {
     this.currentAbility = 0;
     this.player.setVelocity(0, 0);
