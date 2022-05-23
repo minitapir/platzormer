@@ -821,6 +821,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":20,
+         "name":"enemies",
+         "objects":[
+                {
+                 "gid":192,
+                 "height":32,
+                 "id":17,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":352,
+                 "y":4160
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":17,
          "name":"winFlags",
          "objects":[
@@ -842,8 +865,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":20,
- "nextobjectid":17,
+ "nextlayerid":21,
+ "nextobjectid":19,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.8.5",
