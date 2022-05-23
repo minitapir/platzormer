@@ -42,6 +42,9 @@ export default class GameScene extends Phaser.Scene {
   private arrowSpeed: number;
   private timeSinceLastArrowFired: number;
   private arrowSpawnDelay: number;
+  private enemies!: Phaser.Physics.Arcade.Group;
+  private enemyDetectRange: number;
+  private enemySpeed: number;
 
   private getControl = (name: string): Control | undefined => {
     return this.controls.find((control) => control.name === name);
@@ -63,6 +66,8 @@ export default class GameScene extends Phaser.Scene {
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
     this.arrowSpeed = 400;
+    this.enemyDetectRange = 300;
+    this.enemySpeed = 150;
   }
 
   preload = (): void => {
@@ -81,6 +86,7 @@ export default class GameScene extends Phaser.Scene {
     this.handleAbility(delta);
     this.fireArrows(delta);
     this.moveArrows();
+    this.moveEnemies();
   };
 
   // Private fields
@@ -166,6 +172,21 @@ export default class GameScene extends Phaser.Scene {
       this.spikes.add(spikeObject);
     });
 
+    // Enemies
+    // Spikes
+    this.enemies = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    this.map.getObjectLayer("enemies").objects.forEach((enemy) => {
+      const enemyObject = this.map?.createFromObjects("enemies", {
+        key: "tilesetSprite",
+        id: enemy.id,
+        frame: 191,
+      })[0] as Phaser.GameObjects.GameObject;
+      this.enemies.add(enemyObject);
+    });
+
     // Win Flags
     this.winFlags = this.physics.add.group({
       allowGravity: false,
@@ -205,6 +226,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Arrows
     this.physics.add.collider(this.player, this.arrows, this.playerHit);
+
+    // Enemies
+    this.physics.add.collider(this.player, this.enemies, this.playerHit);
 
     // Win flags
     this.physics.add.collider(this.player, this.winFlags, this.playerHit);
@@ -295,6 +319,24 @@ export default class GameScene extends Phaser.Scene {
   private moveArrows = (): void => {
     this.arrows.children.getArray().forEach((arrow) => {
       arrow.setVelocityX(this.arrowSpeed);
+    });
+  };
+
+  private moveEnemies = (): void => {
+    this.enemies.children.each((enemy) => {
+      if (
+        Phaser.Math.Distance.BetweenPoints(
+          enemy.body.position,
+          this.player.body.position
+        ) < this.enemyDetectRange
+      ) {
+        this.physics.moveToObject(enemy, this.player, this.enemySpeed);
+      } else {
+        enemy.body.setVelocity(
+          Math.max(enemy.body.velocity.x - 0.50, 0),
+          Math.max(enemy.body.velocity.y - 0.50, 0)
+        );
+      }
     });
   };
 
