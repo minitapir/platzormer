@@ -1,4 +1,4 @@
-import Phaser, { GameObjects, Tilemaps } from "phaser";
+import Phaser, { Tilemaps } from "phaser";
 
 export interface Control {
   name: string;
@@ -173,17 +173,21 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Enemies
-    // Spikes
+    // Create enemies group
     this.enemies = this.physics.add.group({
       allowGravity: false,
       immovable: true,
     });
+
+    // Create each enemy
     this.map.getObjectLayer("enemies").objects.forEach((enemy) => {
       const enemyObject = this.map?.createFromObjects("enemies", {
         key: "tilesetSprite",
         id: enemy.id,
         frame: 191,
       })[0] as Phaser.GameObjects.GameObject;
+
+      // Add each enemy to the enemy group.
       this.enemies.add(enemyObject);
     });
 
@@ -333,8 +337,8 @@ export default class GameScene extends Phaser.Scene {
         this.physics.moveToObject(enemy, this.player, this.enemySpeed);
       } else {
         enemy.body.setVelocity(
-          Math.max(enemy.body.velocity.x - 0.50, 0),
-          Math.max(enemy.body.velocity.y - 0.50, 0)
+          Math.max(enemy.body.velocity.x - 0.5, 0),
+          Math.max(enemy.body.velocity.y - 0.5, 0)
         );
       }
     });
