@@ -1,6 +1,10 @@
 import Phaser, { Tilemaps } from "phaser";
+import AbilityManager from "./managers/Ability2Manager";
+import CheckpointManager from "./managers/CheckpointManager";
+import EndLevelManager from "./managers/EndLevelManager";
 import EnemyManager from "./managers/EnemyManager";
 import PlayerManager from "./managers/PlayerManager";
+import TimeBonusManager from "./managers/TimeBonusManager";
 
 export interface Control {
   name: string;
@@ -21,7 +25,6 @@ export default class GameScene extends Phaser.Scene {
   public map!: Tilemaps.Tilemap;
   private colliders: Collider[];
   private spikes!: Phaser.Physics.Arcade.Group;
-  private winFlags!: Phaser.Physics.Arcade.Group;
   private arrowWalls!: Phaser.Physics.Arcade.Group;
   private arrows!: Phaser.Physics.Arcade.Group;
   private controls: Control[];
@@ -29,6 +32,10 @@ export default class GameScene extends Phaser.Scene {
   // Managers
   private playerManager!: PlayerManager;
   private enemyManager!: EnemyManager;
+  private timeBonusManager!: TimeBonusManager;
+  private endLevelManager!: EndLevelManager;
+  private checkpointManager!: CheckpointManager;
+  private ability2Manager!: AbilityManager;
 
   // Enemies variables
   private arrowSpeed: number;
@@ -77,11 +84,19 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
     this.load.image("arrow", "assets/images/arrow.png");
+    this.load.image("timeBonus", "assets/images/timeBonus.png");
+    this.load.image("checkpoints", "assets/images/checkpoints.png");
+    this.load.image("power2", "assets/images/power2.png");
+    this.load.image("power3", "assets/images/power3.png");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
     this.load.spritesheet("player", "assets/images/charac.png", {
+      frameWidth: 32,
+      frameHeight: 64,
+    });
+    this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,
     });
@@ -92,8 +107,12 @@ export default class GameScene extends Phaser.Scene {
    */
   private setupMap = (): void => {
     this.add.image(0, 0, "background").setOrigin(0, 0).setScrollFactor(0, 0);
-    this.map = this.make.tilemap({ key: "map" }) as Tilemaps.Tilemap;
-    let tileset = this.map.addTilesetImage("tileset", "tiles");
+    this.map = this.make.tilemap({
+      key: "map",
+      tileHeight: 32,
+      tileWidth: 32,
+    }) as Tilemaps.Tilemap;
+    let tileset = this.map.addTilesetImage("tileset", "tiles", 32, 32);
 
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
@@ -109,22 +128,17 @@ export default class GameScene extends Phaser.Scene {
     this.colliders.push(ground);
     this.colliders.push(wall);
 
-    // Background objects
-    for (let i = 3; i > 0; i--) {
-      this.map.createLayer("backgroundlayer" + i, tileset);
-    }
-
     // Game Objects
     // Arrow walls
     this.arrowWalls = this.physics.add.group({
       allowGravity: false,
       immovable: true,
     });
-    this.map.getObjectLayer("arrowWalls").objects.forEach((arrowWall) => {
-      const arrowWallObject = this.map?.createFromObjects("arrowWalls", {
+    this.map.getObjectLayer("wallArrows").objects.forEach((arrowWall) => {
+      const arrowWallObject = this.map?.createFromObjects("wallArrows", {
         key: "tilesetSprite",
         id: arrowWall.id,
-        frame: 64,
+        frame: 297,
       })[0] as Phaser.GameObjects.GameObject;
       this.arrowWalls.add(arrowWallObject);
     });
@@ -144,23 +158,9 @@ export default class GameScene extends Phaser.Scene {
       const spikeObject = this.map?.createFromObjects("spikes", {
         key: "tilesetSprite",
         id: spike.id,
-        frame: 196,
+        frame: 512,
       })[0] as Phaser.GameObjects.GameObject;
       this.spikes.add(spikeObject);
-    });
-
-    // Win Flags
-    this.winFlags = this.physics.add.group({
-      allowGravity: false,
-      immovable: true,
-    });
-    this.map.getObjectLayer("winFlags").objects.forEach((winFlag) => {
-      const winFlagObject = this.map?.createFromObjects("winFlags", {
-        key: "tilesetSprite",
-        id: winFlag.id,
-        frame: 203,
-      })[0] as Phaser.GameObjects.GameObject;
-      this.winFlags.add(winFlagObject);
     });
   };
 
@@ -204,7 +204,7 @@ export default class GameScene extends Phaser.Scene {
     // Enemies
     this.enemyManager = new EnemyManager(
       this,
-      "enemies",
+      "ghost",
       this.playerManager.player
     );
     this.enemyManager.addCollider(
@@ -213,6 +213,64 @@ export default class GameScene extends Phaser.Scene {
       "collideWithPlayer",
       this.playerManager.playerHit,
       this.enemyManager.enemyHit
+    );
+
+    // Checkpoints
+    this.checkpointManager = new CheckpointManager(
+      this,
+      "checkpoints",
+      this.playerManager.player
+    );
+    this.checkpointManager.addCollider(
+      this.playerManager.player.body.gameObject,
+      "collideWithCheckpoint",
+      "collideWithPlayer",
+      this.playerManager.checkpointReached,
+      this.checkpointManager.collected
+    );
+
+    // Time Bonus
+    this.timeBonusManager = new TimeBonusManager(
+      this,
+      "timeBonus",
+      this.playerManager.player
+    );
+
+    this.timeBonusManager.addCollider(
+      this.playerManager.player.body.gameObject,
+      "collideWithTimeBonus",
+      "collideWithPlayer",
+      this.playerManager.timeBonusCollected,
+      this.timeBonusManager.collected
+    );
+
+    // Power 2
+    this.ability2Manager = this.abilityManager = new AbilityManager(
+      this,
+      "power2",
+      this.playerManager.player
+    );
+    this.ability2Manager.addCollider(
+      this.playerManager.player.body.gameObject,
+      "collideWithPower2",
+      "collideWithPlayer",
+      this.playerManager.power2Collected,
+      this.abilityManager.collected
+    );
+
+    // End level
+    this.endLevelManager = new EndLevelManager(
+      this,
+      "endLevel",
+      this.playerManager.player
+    );
+
+    this.endLevelManager.addCollider(
+      this.playerManager.player.body.gameObject,
+      "collideWithEndLevel",
+      "collideWithPlayer",
+      this.playerManager.win,
+      () => {}
     );
 
     // Controls
@@ -230,7 +288,7 @@ export default class GameScene extends Phaser.Scene {
 
   private setupCamera = (): void => {
     let cam = this.cameras.main.setBounds(0, 0, 1920, 4460);
-    cam.setZoom(1.5);
+    cam.setZoom(1);
     cam.startFollow(this.playerManager.player);
   };
 
@@ -257,7 +315,7 @@ export default class GameScene extends Phaser.Scene {
    */
   private moveArrows = (): void => {
     this.arrows.children.getArray().forEach((arrow) => {
-      arrow.setVelocityX(this.arrowSpeed);
+      arrow.setVelocityX(-this.arrowSpeed);
     });
   };
 

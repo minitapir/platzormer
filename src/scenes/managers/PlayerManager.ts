@@ -4,6 +4,7 @@ import PhysicsManager from "./PhysicsManager";
 
 export default class PlayerManager extends PhysicsManager {
   public player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  private spawnPoint: Phaser.Math.Vector2;
   public playerSpeed: integer;
   public canJump: boolean;
   public currentJumpCount: integer;
@@ -18,8 +19,18 @@ export default class PlayerManager extends PhysicsManager {
 
   constructor(protected scene: GameScene, protected name: string) {
     super(scene, name);
+
+    // Player spawn point
+    const spawnPoint =
+      this.scene.map.getObjectLayer("spawnPointPlayer").objects[0];
+
+    this.spawnPoint = new Phaser.Math.Vector2(
+      spawnPoint.x as number,
+      spawnPoint.y as number
+    );
+
     this.player = this.scene.physics.add
-      .sprite(64, 4064, "player")
+      .sprite(this.spawnPoint.x, this.spawnPoint.y, this.name)
       .setOrigin(0, 0);
 
     // Player settings
@@ -32,7 +43,7 @@ export default class PlayerManager extends PhysicsManager {
     // Abilities
     this.abilitiesCount = 3;
     this.currentAbility = 0;
-    this.abilityChangeDelay = 1000;
+    this.abilityChangeDelay = 200;
     this.timeSinceLastAbilityChange = 0;
 
     // Animations
@@ -98,8 +109,8 @@ export default class PlayerManager extends PhysicsManager {
   public playerHit = (): void => {
     this.currentAbility = 0;
     this.player.setVelocity(0, 0);
-    this.player.setX(64);
-    this.player.setY(4000);
+    this.player.setX(this.spawnPoint.x);
+    this.player.setY(this.spawnPoint.y);
     this.player.setAlpha(0);
     this.scene.tweens.add({
       targets: this.player,
@@ -108,5 +119,21 @@ export default class PlayerManager extends PhysicsManager {
       ease: "Linear",
       repeat: 5,
     });
+  };
+
+  public timeBonusCollected = () => {
+    console.log("just hit the bonus");
+  };
+
+  public win = () => {
+    console.log("you just won!");
+  };
+
+  public checkpointReached = () => {
+    console.log("checkpoint reached");
+  };
+
+  public power2Collected = () => {
+    console.log("power2 collected");
   };
 }
