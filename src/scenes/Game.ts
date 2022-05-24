@@ -1,4 +1,6 @@
 import Phaser, { Tilemaps } from "phaser";
+import EnemyInteraction from "./behaviors/EnemyInteraction";
+import EnemyManager from "./managers/EnemyManager";
 
 export interface Control {
   name: string;
@@ -16,7 +18,7 @@ export class Collider {
 
 export default class GameScene extends Phaser.Scene {
   // Global scene variables
-  private map: Tilemaps.Tilemap | undefined;
+  private map!: Tilemaps.Tilemap;
   private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   private colliders: Collider[];
   private spikes!: Phaser.Physics.Arcade.Group;
@@ -42,9 +44,7 @@ export default class GameScene extends Phaser.Scene {
   private arrowSpeed: number;
   private timeSinceLastArrowFired: number;
   private arrowSpawnDelay: number;
-  private enemies!: Phaser.Physics.Arcade.Group;
-  private enemyDetectRange: number;
-  private enemySpeed: number;
+  private enemyManager!: EnemyManager;
 
   private getControl = (name: string): Control | undefined => {
     return this.controls.find((control) => control.name === name);
@@ -66,8 +66,6 @@ export default class GameScene extends Phaser.Scene {
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
     this.arrowSpeed = 400;
-    this.enemyDetectRange = 300;
-    this.enemySpeed = 150;
   }
 
   preload = (): void => {
@@ -86,7 +84,7 @@ export default class GameScene extends Phaser.Scene {
     this.handleAbility(delta);
     this.fireArrows(delta);
     this.moveArrows();
-    this.moveEnemies();
+    this.enemyManager.update();
   };
 
   // Private fields
@@ -172,25 +170,6 @@ export default class GameScene extends Phaser.Scene {
       this.spikes.add(spikeObject);
     });
 
-    // Enemies
-    // Create enemies group
-    this.enemies = this.physics.add.group({
-      allowGravity: false,
-      immovable: true,
-    });
-
-    // Create each enemy
-    this.map.getObjectLayer("enemies").objects.forEach((enemy) => {
-      const enemyObject = this.map?.createFromObjects("enemies", {
-        key: "tilesetSprite",
-        id: enemy.id,
-        frame: 191,
-      })[0] as Phaser.GameObjects.GameObject;
-
-      // Add each enemy to the enemy group.
-      this.enemies.add(enemyObject);
-    });
-
     // Win Flags
     this.winFlags = this.physics.add.group({
       allowGravity: false,
@@ -232,7 +211,16 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.arrows, this.playerHit);
 
     // Enemies
-    this.physics.add.collider(this.player, this.enemies, this.playerHit);
+    this.enemyManager = new EnemyManager(
+      this.physics,
+      this.map,
+      "enemies",
+      this.player
+    );
+    this.enemyManager.addCollision(
+      this.player.body.gameObject,
+      new EnemyInteraction()
+    );
 
     // Win flags
     this.physics.add.collider(this.player, this.winFlags, this.playerHit);
@@ -323,24 +311,6 @@ export default class GameScene extends Phaser.Scene {
   private moveArrows = (): void => {
     this.arrows.children.getArray().forEach((arrow) => {
       arrow.setVelocityX(this.arrowSpeed);
-    });
-  };
-
-  private moveEnemies = (): void => {
-    this.enemies.children.each((enemy) => {
-      if (
-        Phaser.Math.Distance.BetweenPoints(
-          enemy.body.position,
-          this.player.body.position
-        ) < this.enemyDetectRange
-      ) {
-        this.physics.moveToObject(enemy, this.player, this.enemySpeed);
-      } else {
-        enemy.body.setVelocity(
-          Math.max(enemy.body.velocity.x - 0.5, 0),
-          Math.max(enemy.body.velocity.y - 0.5, 0)
-        );
-      }
     });
   };
 

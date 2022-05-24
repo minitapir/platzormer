@@ -1,15 +1,23 @@
+import { GameObjects, Tilemaps } from "phaser";
+import IInteraction from "../behaviors/IInteraction";
 import DynamicComponent from "../components/DynamicComponent";
 
 export default abstract class PhysicsManager {
+  protected group!: Phaser.Physics.Arcade.Group;
+
   constructor(
     protected physics: Phaser.Physics.Arcade.ArcadePhysics,
-    name: string
+    protected map: Tilemaps.Tilemap,
+    protected name: string
   ) {
-    this.physics.add.group({
+    this.group = this.physics.add.group({
       name: name,
       allowGravity: false,
       immovable: true,
     });
   }
-  public abstract add: (dynamicComponent: DynamicComponent) => void;
+  public abstract addCollision: (
+    collider: GameObjects.GameObject,
+    behavior: IInteraction
+  ) => void;
 }
