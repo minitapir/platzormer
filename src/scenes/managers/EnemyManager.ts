@@ -1,5 +1,6 @@
 import { GameObjects, Tilemaps } from "phaser";
 import IInteraction from "../behaviors/IInteraction";
+import GameScene from "../Game";
 import PhysicsManager from "./PhysicsManager";
 
 export default class EnemyManager extends PhysicsManager {
@@ -7,17 +8,16 @@ export default class EnemyManager extends PhysicsManager {
   private enemySpeed: number;
 
   constructor(
-    protected physics: Phaser.Physics.Arcade.ArcadePhysics,
-    protected map: Tilemaps.Tilemap,
+    protected scene: GameScene,
     protected name: string,
     private player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
   ) {
-    super(physics, map, name);
+    super(scene, name);
     this.enemyDetectRange = 300;
     this.enemySpeed = 150;
 
-    this.map.getObjectLayer(this.name).objects.forEach((enemy) => {
-      const enemyObject = this.map?.createFromObjects(this.name, {
+    this.scene.map.getObjectLayer(this.name).objects.forEach((enemy) => {
+      const enemyObject = this.scene.map?.createFromObjects(this.name, {
         key: "tilesetSprite",
         id: enemy.id,
         frame: 191,
@@ -36,7 +36,7 @@ export default class EnemyManager extends PhysicsManager {
           this.player.body.position
         ) < this.enemyDetectRange
       ) {
-        this.physics.moveToObject(enemy, this.player, this.enemySpeed);
+        this.scene.physics.moveToObject(enemy, this.player, this.enemySpeed);
       } else {
         enemy.body.setVelocity(
           Math.max(enemy.body.velocity.x - 0.5, 0),
@@ -50,6 +50,10 @@ export default class EnemyManager extends PhysicsManager {
     collider: GameObjects.GameObject,
     behavior: IInteraction
   ): void => {
-    this.physics.add.collider(collider, this.group, behavior.onInteraction);
+    this.scene.physics.add.collider(
+      collider,
+      this.group,
+      behavior.onInteraction
+    );
   };
 }

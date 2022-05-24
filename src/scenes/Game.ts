@@ -1,6 +1,7 @@
 import Phaser, { Tilemaps } from "phaser";
 import EnemyInteraction from "./behaviors/EnemyInteraction";
 import EnemyManager from "./managers/EnemyManager";
+import PlayerManager from "./managers/PlayerManager";
 
 export interface Control {
   name: string;
@@ -18,51 +19,29 @@ export class Collider {
 
 export default class GameScene extends Phaser.Scene {
   // Global scene variables
-  private map!: Tilemaps.Tilemap;
-  private player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  public map!: Tilemaps.Tilemap;
   private colliders: Collider[];
   private spikes!: Phaser.Physics.Arcade.Group;
   private winFlags!: Phaser.Physics.Arcade.Group;
   private arrowWalls!: Phaser.Physics.Arcade.Group;
   private arrows!: Phaser.Physics.Arcade.Group;
-
-  // Control variables
-  private speed: integer;
   private controls: Control[];
-  private canJump: boolean;
-  private currentJumpCount: integer;
-  private jumpMax: integer;
-  private jumpStrength: integer;
 
-  // Abilities variables
-  private abilitiesCount: integer;
-  private currentAbility: integer;
-  private abilityChangeDelay: integer;
-  private timeSinceLastAbilityChange: number;
+  // Managers
+  private playerManager!: PlayerManager;
+  private enemyManager!: EnemyManager;
 
   // Enemies variables
   private arrowSpeed: number;
   private timeSinceLastArrowFired: number;
   private arrowSpawnDelay: number;
-  private enemyManager!: EnemyManager;
-
-  private getControl = (name: string): Control | undefined => {
-    return this.controls.find((control) => control.name === name);
-  };
 
   constructor() {
     super("GameScene");
+    // Controls
     this.controls = [];
+
     this.colliders = [];
-    this.speed = 300;
-    this.jumpStrength = 450;
-    this.canJump = true;
-    this.jumpMax = 2;
-    this.currentJumpCount = this.jumpMax;
-    this.abilitiesCount = 3;
-    this.currentAbility = 0;
-    this.abilityChangeDelay = 1000;
-    this.timeSinceLastAbilityChange = 0;
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
     this.arrowSpeed = 400;
@@ -74,21 +53,23 @@ export default class GameScene extends Phaser.Scene {
 
   create = (): void => {
     this.setupMap();
-    this.setupPlayer();
+    this.setupManagers();
     this.setupCamera();
   };
 
   update = (time: number, delta: number): void => {
-    this.setVelocity();
-    this.handleJump();
+    this.playerManager.update();
     this.handleAbility(delta);
     this.fireArrows(delta);
     this.moveArrows();
     this.enemyManager.update();
   };
 
-  // Private fields
+  public getControl = (name: string): Control | undefined => {
+    return this.controls.find((control) => control.name === name);
+  };
 
+  // Private fields
   /**
    * This method handles images loading at game creation.
    */
@@ -135,7 +116,6 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Game Objects
-
     // Arrow walls
     this.arrowWalls = this.physics.add.group({
       allowGravity: false,
@@ -185,12 +165,16 @@ export default class GameScene extends Phaser.Scene {
     });
   };
 
-  private setupPlayer = (): void => {
-    this.player = this.physics.add.sprite(64, 4064, "player").setOrigin(0, 0);
+  private setupManagers = (): void => {
+    this.playerManager = new PlayerManager(this, "player");
 
     // Colliders
     this.colliders.forEach((collider) => {
-      this.physics.add.collider(this.player, collider.layer, collider.behavior);
+      this.physics.add.collider(
+        this.playerManager.player,
+        collider.layer,
+        collider.behavior
+      );
       this.physics.add.collider(
         this.arrows,
         collider.layer,
@@ -202,37 +186,38 @@ export default class GameScene extends Phaser.Scene {
 
     // Game Objects
     // Arrow walls
-    this.physics.add.collider(this.player, this.arrowWalls);
+    this.physics.add.collider(this.playerManager.player, this.arrowWalls);
 
     // Spikes
-    this.physics.add.collider(this.player, this.spikes, this.playerHit);
+    this.physics.add.collider(
+      this.playerManager.player,
+      this.spikes,
+      this.playerManager.playerHit
+    );
 
     // Arrows
-    this.physics.add.collider(this.player, this.arrows, this.playerHit);
+    this.physics.add.collider(
+      this.playerManager.player,
+      this.arrows,
+      this.playerManager.playerHit
+    );
 
     // Enemies
     this.enemyManager = new EnemyManager(
-      this.physics,
-      this.map,
+      this,
       "enemies",
-      this.player
+      this.playerManager.player
     );
     this.enemyManager.addCollision(
-      this.player.body.gameObject,
+      this.playerManager.player.body.gameObject,
       new EnemyInteraction()
     );
 
     // Win flags
-    this.physics.add.collider(this.player, this.winFlags, this.playerHit);
-
-    // Animations
-    const characters = ["yellow", "purple", "blue"];
-    characters.forEach((character, index) =>
-      this.anims.create({
-        key: character,
-        frames: [{ key: "player", frame: index }],
-        frameRate: 20,
-      })
+    this.physics.add.collider(
+      this.playerManager.player,
+      this.winFlags,
+      this.playerManager.playerHit
     );
 
     // Controls
@@ -251,40 +236,7 @@ export default class GameScene extends Phaser.Scene {
   private setupCamera = (): void => {
     let cam = this.cameras.main.setBounds(0, 0, 1920, 4460);
     cam.setZoom(1.5);
-    cam.startFollow(this.player);
-  };
-
-  private setVelocity = (): void => {
-    if (this.getControl("left")?.control.isDown) {
-      this.player.setVelocityX(-this.speed);
-    } else if (this.getControl("right")?.control.isDown) {
-      this.player.setVelocityX(this.speed);
-    } else {
-      this.player.setVelocityX(0);
-    }
-    this.player.anims.play("yellow");
-  };
-
-  private handleJump = (): void => {
-    if (this.player.body.blocked.down) {
-      this.currentJumpCount = this.jumpMax;
-    }
-
-    if (
-      this.getControl("jump")?.control.isDown &&
-      this.currentJumpCount > 0 &&
-      this.canJump
-    ) {
-      //si Z est appuyé, que la var jump est encore utilisable et que le joueur peut sauter,
-      //alors il a le droit à un autre saut et saute
-      this.currentJumpCount--;
-      this.canJump = false;
-      this.player.setVelocityY(-this.jumpStrength);
-    }
-    if (this.getControl("jump")?.control.isUp) {
-      //lorsque la touche Z n'est plus appuyée, alors il remplit une des conditions pour sauter de nouveau
-      this.canJump = true;
-    }
+    cam.startFollow(this.playerManager.player);
   };
 
   /**
@@ -294,7 +246,7 @@ export default class GameScene extends Phaser.Scene {
   private fireArrows = (delta: number): void => {
     if (this.timeSinceLastArrowFired >= this.arrowSpawnDelay) {
       this.arrowWalls.children.getArray().forEach((wall) => {
-        const playerY = Math.round(this.player.y) + 64;
+        const playerY = Math.round(this.playerManager.player.y) + 64;
         const wallY = Math.round(wall.y);
         if (playerY >= wallY && playerY <= wallY + 32) {
           this.arrows.get(wall.x + 32, wallY, "arrow");
@@ -314,72 +266,67 @@ export default class GameScene extends Phaser.Scene {
     });
   };
 
-  /**
-   * When player is hit, reset.
-   */
-  private playerHit = (): void => {
-    this.currentAbility = 0;
-    this.player.setVelocity(0, 0);
-    this.player.setX(64);
-    this.player.setY(4000);
-    this.player.setAlpha(0);
-    this.tweens.add({
-      targets: this.player,
-      alpha: 1,
-      duration: 100,
-      ease: "Linear",
-      repeat: 5,
-    });
-  };
-
   private wallClimb = (): void => {
-    this.currentJumpCount = 0;
-    if (this.currentAbility === 0 || this.currentAbility === 3) {
+    this.playerManager.currentJumpCount = 0;
+    if (
+      this.playerManager.currentAbility === 0 ||
+      this.playerManager.currentAbility === 3
+    ) {
       if (
         this.getControl("left")?.control.isDown ||
         this.getControl("right")?.control.isDown
       ) {
-        if (this.player.body.blocked.left || this.player.body.blocked.right) {
-          this.player.setVelocityY(-this.speed);
+        if (
+          this.playerManager.player.body.blocked.left ||
+          this.playerManager.player.body.blocked.right
+        ) {
+          this.playerManager.player.setVelocityY(
+            -this.playerManager.playerSpeed
+          );
         }
       }
     }
   };
 
   private nextAbility = () => {
-    if (this.timeSinceLastAbilityChange >= this.abilityChangeDelay) {
-      this.currentAbility++;
-      if (this.currentAbility === this.abilitiesCount) {
-        this.currentAbility = 0;
+    if (
+      this.playerManager.timeSinceLastAbilityChange >=
+      this.playerManager.abilityChangeDelay
+    ) {
+      this.playerManager.currentAbility++;
+      if (
+        this.playerManager.currentAbility === this.playerManager.abilitiesCount
+      ) {
+        this.playerManager.currentAbility = 0;
       }
-      this.timeSinceLastAbilityChange = 0;
+      this.playerManager.timeSinceLastAbilityChange = 0;
     }
   };
 
   private handleAbility = (delta: number): void => {
-    this.timeSinceLastAbilityChange += delta;
+    this.playerManager.timeSinceLastAbilityChange += delta;
     if (this.getControl("action")?.control.isDown) {
       this.nextAbility();
     }
 
-    if (this.currentAbility === 0) {
-      this.player.anims.play("yellow");
+    if (this.playerManager.currentAbility === 0) {
+      this.playerManager.player.anims.play("yellow");
     }
 
-    if (this.currentAbility === 1) {
-      this.player.anims.play("blue");
+    if (this.playerManager.currentAbility === 1) {
+      this.playerManager.player.anims.play("blue");
 
-      this.speed = 500;
-      this.jumpMax = 2;
-      this.jumpStrength = 500;
+      this.playerManager.playerSpeed = 500;
+      this.playerManager.jumpMax = 2;
+      this.playerManager.jumpStrength = 500;
     } else {
-      this.speed = 300;
-      this.jumpMax = 1;
-      this.jumpStrength = 450;
+      this.playerManager.playerSpeed = 300;
+      this.playerManager.jumpMax = 1;
+      this.playerManager.jumpStrength = 450;
     }
 
-    if (this.currentAbility === 2) {
-      this.player.anims.play("purple");
+    if (this.playerManager.currentAbility === 2) {
+      this.playerManager.player.anims.play("purple");
     }
   };
 }
