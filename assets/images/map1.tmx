@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="21" nextobjectid="19">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="21" nextobjectid="20">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
@@ -716,7 +716,7 @@
   <object id="16" gid="65" x="32" y="3968" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="20" name="enemies">
-  <object id="17" gid="192" x="352" y="4160" width="32" height="32"/>
+  <object id="17" gid="192" x="416" y="4064" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="17" name="winFlags">
   <object id="6" name="win1" gid="204" x="1700" y="1984" width="32" height="32"/>
