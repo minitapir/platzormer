@@ -1,5 +1,4 @@
 import Phaser, { Tilemaps } from "phaser";
-import EnemyInteraction from "./behaviors/EnemyInteraction";
 import EnemyManager from "./managers/EnemyManager";
 import PlayerManager from "./managers/PlayerManager";
 
@@ -208,16 +207,12 @@ export default class GameScene extends Phaser.Scene {
       "enemies",
       this.playerManager.player
     );
-    this.enemyManager.addCollision(
+    this.enemyManager.addCollider(
       this.playerManager.player.body.gameObject,
-      new EnemyInteraction()
-    );
-
-    // Win flags
-    this.physics.add.collider(
-      this.playerManager.player,
-      this.winFlags,
-      this.playerManager.playerHit
+      "collideWithEnemy",
+      "collideWithPlayer",
+      this.playerManager.playerHit,
+      this.enemyManager.enemyHit
     );
 
     // Controls

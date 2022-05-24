@@ -1,4 +1,4 @@
-import IInteraction from "../behaviors/IInteraction";
+import { GameObjects } from "phaser";
 import GameScene from "../Game";
 import PhysicsManager from "./PhysicsManager";
 
@@ -51,9 +51,12 @@ export default class PlayerManager extends PhysicsManager {
     this.handleJump();
   };
 
-  public addCollision = (
-    collider: Phaser.GameObjects.GameObject,
-    behavior: IInteraction
+  public addCollider = (
+    collider: GameObjects.GameObject,
+    colliderEventName: string,
+    collidedEventName: string,
+    colliderCallback: () => void,
+    collidedCallback: () => void
   ): void => {};
 
   private handleJump = (): void => {

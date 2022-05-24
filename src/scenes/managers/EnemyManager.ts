@@ -1,5 +1,4 @@
-import { GameObjects, Tilemaps } from "phaser";
-import IInteraction from "../behaviors/IInteraction";
+import { Game, GameObjects } from "phaser";
 import GameScene from "../Game";
 import PhysicsManager from "./PhysicsManager";
 
@@ -46,14 +45,33 @@ export default class EnemyManager extends PhysicsManager {
     });
   };
 
-  public addCollision = (
+  public addCollider = (
     collider: GameObjects.GameObject,
-    behavior: IInteraction
+    colliderEventName: string,
+    collidedEventName: string,
+    colliderCallback: () => void,
+    collidedCallback: ([]) => void
   ): void => {
     this.scene.physics.add.collider(
       collider,
       this.group,
-      behavior.onInteraction
+      (collider, collided) => {
+        collider.emit(colliderEventName);
+        collided.emit(collidedEventName, collided);
+      }
     );
+
+    collider.addListener(colliderEventName, colliderCallback);
+    this.group.children.each((enemy) => {
+      enemy.setData("originPositionX", enemy.body.position.x);
+      enemy.setData("originPositionY", enemy.body.position.y);
+      enemy.addListener(collidedEventName, collidedCallback);
+    });
+  };
+
+  public enemyHit = (enemy: GameObjects.Sprite): void => {
+    enemy.setX(enemy.getData("originPositionX"));
+    enemy.setY(enemy.getData("originPositionY"));
+    enemy.body.setVelocity(0);
   };
 }

@@ -1,6 +1,4 @@
-import { GameObjects, Tilemaps } from "phaser";
-import IInteraction from "../behaviors/IInteraction";
-import DynamicComponent from "../components/DynamicComponent";
+import { GameObjects } from "phaser";
 import GameScene from "../Game";
 
 export default abstract class PhysicsManager {
@@ -13,8 +11,11 @@ export default abstract class PhysicsManager {
       immovable: true,
     });
   }
-  public abstract addCollision: (
+  public abstract addCollider: (
     collider: GameObjects.GameObject,
-    behavior: IInteraction
+    colliderEventName: string,
+    collidedEventName: string,
+    colliderCallback: () => void,
+    collidedCallback: () => void
   ) => void;
 }
