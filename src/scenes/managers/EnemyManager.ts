@@ -15,16 +15,15 @@ export default class EnemyManager extends PhysicsManager {
     this.enemyDetectRange = 300;
     this.enemySpeed = 150;
 
-    this.scene.map.getObjectLayer(this.name).objects.forEach((enemy) => {
-      const enemyObject = this.scene.map?.createFromObjects(this.name, {
-        key: "tilesetSprite",
-        id: enemy.id,
-        frame: 191,
-      })[0] as Phaser.GameObjects.GameObject;
-
-      // Add each enemy to the enemy group.
-      this.group.add(enemyObject);
-    });
+    const enemiesSpawnPoints = this.scene.map
+      .getObjectLayer(this.name)
+      .objects.forEach((enemy) => {
+        const enemyObject = this.scene.physics.add
+          .sprite(enemy.x as number, enemy.y as number, this.name)
+          .setOrigin(0, 0);
+        // Add each enemy to the enemy group.
+        this.group.add(enemyObject);
+      });
   }
 
   public update = (): void => {
