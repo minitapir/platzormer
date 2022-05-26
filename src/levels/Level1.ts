@@ -1,10 +1,10 @@
-import Phaser, { Tilemaps } from "phaser";
-import AbilityManager from "./managers/Ability2Manager";
-import CheckpointManager from "./managers/CheckpointManager";
-import EndLevelManager from "./managers/EndLevelManager";
-import EnemyManager from "./managers/EnemyManager";
-import PlayerManager from "./managers/PlayerManager";
-import TimeBonusManager from "./managers/TimeBonusManager";
+import Phaser, { GameObjects, Tilemaps } from "phaser";
+import AbilityManager from "../scenes/managers/Ability2Manager";
+import CheckpointManager from "../scenes/managers/CheckpointManager";
+import EndLevelManager from "../scenes/managers/EndLevelManager";
+import EnemyManager from "../scenes/managers/EnemyManager";
+import PlayerManager from "../scenes/managers/PlayerManager";
+import TimeBonusManager from "../scenes/managers/TimeBonusManager";
 
 export interface Control {
   name: string;
@@ -20,7 +20,7 @@ export class Collider {
   }
 }
 
-export default class GameScene extends Phaser.Scene {
+export default class Level1 extends Phaser.Scene {
   // Global scene variables
   public map!: Tilemaps.Tilemap;
   private colliders: Collider[];
@@ -43,14 +43,14 @@ export default class GameScene extends Phaser.Scene {
   private arrowSpawnDelay: number;
 
   constructor() {
-    super("GameScene");
+    super("Level1");
     // Controls
     this.controls = [];
 
     this.colliders = [];
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
-    this.arrowSpeed = 400;
+    this.arrowSpeed = 250;
   }
 
   preload = (): void => {
@@ -83,7 +83,6 @@ export default class GameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/images/map1.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
-    this.load.image("arrow", "assets/images/arrow.png");
     this.load.image("timeBonus", "assets/images/timeBonus.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
     this.load.image("power2", "assets/images/power2.png");
@@ -99,6 +98,10 @@ export default class GameScene extends Phaser.Scene {
     this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,
+    });
+    this.load.spritesheet("arrows", "assets/images/animSpritesheets/arrows.png", {
+      frameWidth: 96,
+      frameHeight: 32,
     });
   };
 
@@ -117,6 +120,9 @@ export default class GameScene extends Phaser.Scene {
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
     ground.layer.setCollisionByExclusion([-1]);
+
+    // Background 
+     this.map.createLayer("background", tileset);
 
     // Climbable walls
     const wall = new Collider(
@@ -302,7 +308,7 @@ export default class GameScene extends Phaser.Scene {
         const playerY = Math.round(this.playerManager.player.y) + 64;
         const wallY = Math.round(wall.y);
         if (playerY >= wallY && playerY <= wallY + 32) {
-          this.arrows.get(wall.x + 32, wallY, "arrow");
+          const newArrow = this.arrows.get(wall.x + 32, wallY, "arrows", 1) as GameObjects.Sprite;
         }
       });
       this.timeSinceLastArrowFired = 0;

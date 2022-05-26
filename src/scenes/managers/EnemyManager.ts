@@ -1,5 +1,5 @@
 import { Game, GameObjects } from "phaser";
-import GameScene from "../Game";
+import GameScene from "../../levels/Level1";
 import PhysicsManager from "./PhysicsManager";
 
 export default class EnemyManager extends PhysicsManager {
@@ -13,7 +13,7 @@ export default class EnemyManager extends PhysicsManager {
   ) {
     super(scene, name);
     this.enemyDetectRange = 300;
-    this.enemySpeed = 150;
+    this.enemySpeed = 100;
 
     const enemiesSpawnPoints = this.scene.map
       .getObjectLayer(this.name)

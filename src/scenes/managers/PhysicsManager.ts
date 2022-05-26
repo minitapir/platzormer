@@ -1,5 +1,5 @@
 import { GameObjects } from "phaser";
-import GameScene from "../Game";
+import GameScene from "../../levels/Level1";
 
 export default abstract class PhysicsManager {
   protected group!: Phaser.Physics.Arcade.Group;

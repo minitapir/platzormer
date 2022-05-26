@@ -1,5 +1,5 @@
 import { GameObjects } from "phaser";
-import GameScene from "../Game";
+import GameScene from "../../levels/Level1";
 import PhysicsManager from "./PhysicsManager";
 
 export default class PlayerManager extends PhysicsManager {
@@ -126,7 +126,7 @@ export default class PlayerManager extends PhysicsManager {
   };
 
   public win = () => {
-    console.log("you just won!");
+    this.scene.scene.start("Level2");
   };
 
   public checkpointReached = () => {

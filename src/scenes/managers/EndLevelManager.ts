@@ -1,5 +1,5 @@
 import { Game, GameObjects } from "phaser";
-import GameScene from "../Game";
+import GameScene from "../../levels/Level1";
 import PhysicsManager from "./PhysicsManager";
 
 export default class EndLevelManager extends PhysicsManager {
@@ -49,6 +49,5 @@ export default class EndLevelManager extends PhysicsManager {
   };
 
   public collected = (bonus: GameObjects.Sprite) => {
-    console.log("well");
   };
 }
