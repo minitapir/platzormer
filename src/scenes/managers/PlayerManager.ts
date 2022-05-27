@@ -119,6 +119,11 @@ export default class PlayerManager extends PhysicsManager {
       ease: "Linear",
       repeat: 5,
     });
+
+    // When player is hit, call collision for all enemies
+    this.scene.enemyManager.getEnemies().children.each((enemy) => {
+      enemy.emit("collideWithPlayer", enemy);
+    });
   };
 
   public timeBonusCollected = () => {
