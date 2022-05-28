@@ -29,7 +29,7 @@ export default class EndLevelManager extends PhysicsManager {
     colliderEventName: string,
     collidedEventName: string,
     colliderCallback: () => void,
-    collidedCallback: ([]) => void
+    collidedCallback: ([]) => void = () => {}
   ): void => {
     this.scene.physics.add.overlap(
       collider,
@@ -48,6 +48,5 @@ export default class EndLevelManager extends PhysicsManager {
     });
   };
 
-  public collected = (bonus: GameObjects.Sprite) => {
-  };
+  public collected = (bonus: GameObjects.Sprite) => {};
 }

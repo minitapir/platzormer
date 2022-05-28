@@ -1,6 +1,7 @@
 import { Game, GameObjects } from "phaser";
 import GameScene from "../../levels/Level1";
 import PhysicsManager from "./PhysicsManager";
+import PlayerManager from "./PlayerManager";
 
 export default class EnemyManager extends PhysicsManager {
   private enemyDetectRange: number;
@@ -9,7 +10,7 @@ export default class EnemyManager extends PhysicsManager {
   constructor(
     protected scene: GameScene,
     protected name: string,
-    private player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+    private playerManager: PlayerManager
   ) {
     super(scene, name);
     this.enemyDetectRange = 300;
@@ -26,15 +27,19 @@ export default class EnemyManager extends PhysicsManager {
       });
   }
 
-  public update = (): void => {
+  public update = (delta: number): void => {
     this.group.children.each((enemy) => {
       if (
         Phaser.Math.Distance.BetweenPoints(
           enemy.body.position,
-          this.player.body.position
+          this.playerManager.player.body.position
         ) < this.enemyDetectRange
       ) {
-        this.scene.physics.moveToObject(enemy, this.player, this.enemySpeed);
+        this.scene.physics.moveToObject(
+          enemy,
+          this.playerManager.player,
+          this.enemySpeed
+        );
       } else {
         enemy.body.setVelocity(
           Math.max(enemy.body.velocity.x - 0.5, 0),
@@ -48,15 +53,15 @@ export default class EnemyManager extends PhysicsManager {
     collider: GameObjects.GameObject,
     colliderEventName: string,
     collidedEventName: string,
-    colliderCallback: () => void,
+    colliderCallback: ([]) => void,
     collidedCallback: ([]) => void
   ): void => {
     this.scene.physics.add.collider(
       collider,
       this.group,
       (collider, collided) => {
-        collider.emit(colliderEventName);
-        collided.emit(collidedEventName, collided);
+        collider.emit(colliderEventName, [collider, collided]);
+        collided.emit(collidedEventName, [collider, collided]);
       }
     );
 
@@ -68,7 +73,21 @@ export default class EnemyManager extends PhysicsManager {
     });
   };
 
-  public enemyHit = (enemy: GameObjects.Sprite): void => {
+  /**
+   * When ghost hits the player, if the player is above and has the correct ability, the ghost is killed.
+   */
+  public handleCollisionWithPlayer = ([player, enemy]: [
+    GameObjects.Sprite,
+    GameObjects.Sprite
+  ]): void => {
+    if (enemy.body.touching.up && this.playerManager.currentAbility === 2) {
+      enemy.destroy();
+    } else {
+      this.respawn(enemy);
+    }
+  };
+
+  public override respawn = (enemy: GameObjects.Sprite): void => {
     enemy.setX(enemy.getData("originPositionX"));
     enemy.setY(enemy.getData("originPositionY"));
     enemy.body.setVelocity(0);

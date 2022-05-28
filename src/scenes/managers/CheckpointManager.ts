@@ -15,7 +15,7 @@ export default class CheckpointManager extends PhysicsManager {
       .objects.forEach((objectTile) => {
         const object = this.scene.physics.add
           .sprite(objectTile.x as number, objectTile.y as number, this.name)
-          .setOrigin(0,1)
+          .setOrigin(0, 1)
           .setScale(0.4);
         // Add each object to the enemy group.
         this.group.add(object);
@@ -53,4 +53,6 @@ export default class CheckpointManager extends PhysicsManager {
   public collected = (item: GameObjects.Sprite) => {
     item.destroy();
   };
+
+  public override respawn = (sprite: GameObjects.Sprite) => {};
 }
