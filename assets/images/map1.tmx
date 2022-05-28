@@ -451,7 +451,7 @@
   <object id="126" x="928" y="576" width="160" height="64"/>
  </objectgroup>
  <objectgroup id="26" name="spawnPointPlayer">
-  <object id="131" x="1002" y="450">
+  <object id="131" x="684" y="4154">
    <point/>
   </object>
  </objectgroup>
