@@ -12,6 +12,7 @@ export default class PlayerManager extends PhysicsManager {
   public jumpStrength: integer;
 
   // Abilities variables
+  public hasPower: boolean[];
   public abilitiesCount: integer;
   public currentAbility: integer;
   public abilityChangeDelay: integer;
@@ -45,6 +46,7 @@ export default class PlayerManager extends PhysicsManager {
     this.currentAbility = 0;
     this.abilityChangeDelay = 200;
     this.timeSinceLastAbilityChange = 0;
+    this.hasPower = [true, false, false]; // By default, has only climb power
 
     // Animations
     const characters = ["yellow", "purple", "blue"];
@@ -111,16 +113,6 @@ export default class PlayerManager extends PhysicsManager {
     this.terminalVelocityCheck();
   };
 
-  private nextAbility = () => {
-    if (this.timeSinceLastAbilityChange >= this.abilityChangeDelay) {
-      this.currentAbility++;
-      if (this.currentAbility === this.abilitiesCount) {
-        this.currentAbility = 0;
-      }
-      this.timeSinceLastAbilityChange = 0;
-    }
-  };
-
   // Abilities
   private handleAbility = (delta: number): void => {
     this.timeSinceLastAbilityChange += delta;
@@ -146,6 +138,28 @@ export default class PlayerManager extends PhysicsManager {
 
     if (this.currentAbility === 2) {
       this.player.anims.play("purple");
+    }
+  };
+
+  /**
+   * Find next available ability
+   */
+  private nextAbility = () => {
+    if (this.timeSinceLastAbilityChange >= this.abilityChangeDelay) {
+      let foundNextPower = false;
+      let i = this.currentAbility + 1;
+      while (!foundNextPower) {
+        // If we are at array's end, loop at its begining
+        if (i === this.abilitiesCount) {
+          i = 0;
+        }
+        if (this.hasPower[i]) {
+          this.currentAbility = i;
+          this.timeSinceLastAbilityChange = 0;
+          foundNextPower = true;
+        }
+        i += 1;
+      }
     }
   };
 
@@ -196,7 +210,11 @@ export default class PlayerManager extends PhysicsManager {
     console.log("checkpoint reached");
   };
 
-  public power2Collected = () => {
-    console.log("power2 collected");
+  public unlockPower2 = () => {
+    this.hasPower[1] = true;
+  };
+
+  public unlockPower3 = () => {
+    this.hasPower[2] = true;
   };
 }
