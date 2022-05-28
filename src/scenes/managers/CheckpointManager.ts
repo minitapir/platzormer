@@ -37,8 +37,8 @@ export default class CheckpointManager extends PhysicsManager {
       collider,
       this.group,
       (collider, collided) => {
-        collider.emit(colliderEventName);
-        collided.emit(collidedEventName, collided);
+        collider.emit(colliderEventName, [collider, collided]);
+        collided.emit(collidedEventName, [collider, collided]);
       }
     );
 
@@ -50,7 +50,10 @@ export default class CheckpointManager extends PhysicsManager {
     });
   };
 
-  public collected = (item: GameObjects.Sprite) => {
+  public collected = ([player, item]: [
+    GameObjects.Sprite,
+    GameObjects.Sprite
+  ]) => {
     item.destroy();
   };
 
