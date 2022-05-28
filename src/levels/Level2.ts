@@ -32,7 +32,6 @@ export default class Level2 extends Phaser.Scene {
   // Managers
   private playerManager!: PlayerManager;
   private enemyManager!: EnemyManager;
-  private timeBonusManager!: TimeBonusManager;
   private endLevelManager!: EndLevelManager;
   private checkpointManager!: CheckpointManager;
   private ability2Manager!: AbilityManager;
@@ -82,7 +81,6 @@ export default class Level2 extends Phaser.Scene {
     this.load.tilemapTiledJSON("map2", "assets/images/map2.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
-    this.load.image("timeBonus", "assets/images/timeBonus.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
     this.load.image("power3", "assets/images/power3.png");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
@@ -231,21 +229,6 @@ export default class Level2 extends Phaser.Scene {
       "collideWithPlayer",
       this.playerManager.checkpointReached,
       this.checkpointManager.collected
-    );
-
-    // Time Bonus
-    this.timeBonusManager = new TimeBonusManager(
-      this,
-      "timeBonus",
-      this.playerManager.player
-    );
-
-    this.timeBonusManager.addCollider(
-      this.playerManager.player.body.gameObject,
-      "collideWithTimeBonus",
-      "collideWithPlayer",
-      this.playerManager.timeBonusCollected,
-      this.timeBonusManager.collected
     );
 
     // Power 2
