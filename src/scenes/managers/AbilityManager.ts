@@ -2,7 +2,7 @@ import { Game, GameObjects } from "phaser";
 import GameScene from "../../levels/Level1";
 import PhysicsManager from "./PhysicsManager";
 
-export default class Ability2Manager extends PhysicsManager {
+export default class AbilityManager extends PhysicsManager {
   constructor(
     protected scene: GameScene,
     protected name: string,
@@ -16,7 +16,7 @@ export default class Ability2Manager extends PhysicsManager {
         const object = this.scene.physics.add
           .sprite(objectTile.x as number, objectTile.y as number, this.name)
           .setOrigin(0, 1)
-          .setDisplaySize(64, 64)
+          .setDisplaySize(64, 64);
         // Add each object to the enemy group.
         this.group.add(object);
       });
@@ -53,4 +53,6 @@ export default class Ability2Manager extends PhysicsManager {
   public collected = (item: GameObjects.Sprite) => {
     item.destroy();
   };
+
+  public override respawn = (sprite: GameObjects.Sprite): void => {};
 }
