@@ -26,7 +26,7 @@ export default class Level1 extends AbstractLevel {
       this.playerManager.player.body.gameObject,
       "collideWithPower2",
       "collideWithPlayer",
-      this.playerManager.power2Collected,
+      this.playerManager.unlockPower2,
       this.abilityManager.collected
     );
 
