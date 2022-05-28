@@ -26,10 +26,6 @@ export default class EnemyManager extends PhysicsManager {
       });
   }
 
-  public getEnemies = (): Phaser.Physics.Arcade.Group => {
-    return this.group;
-  };
-
   public update = (): void => {
     this.group.children.each((enemy) => {
       if (
@@ -71,7 +67,7 @@ export default class EnemyManager extends PhysicsManager {
       enemy.addListener(collidedEventName, collidedCallback);
     });
   };
-  
+
   public enemyHit = (enemy: GameObjects.Sprite): void => {
     enemy.setX(enemy.getData("originPositionX"));
     enemy.setY(enemy.getData("originPositionY"));

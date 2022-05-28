@@ -60,6 +60,7 @@ export default class PlayerManager extends PhysicsManager {
   public update = (): void => {
     this.setVelocity();
     this.handleJump();
+    this.terminalVelocityCheck();
   };
 
   public addCollider = (
@@ -68,7 +69,7 @@ export default class PlayerManager extends PhysicsManager {
     collidedEventName: string,
     colliderCallback: () => void,
     collidedCallback: () => void
-  ): void => {};
+  ): void => { };
 
   private handleJump = (): void => {
     if (this.player.body.blocked.down) {
@@ -91,6 +92,12 @@ export default class PlayerManager extends PhysicsManager {
       this.canJump = true;
     }
   };
+
+  private terminalVelocityCheck = (): void => {
+    if (this.player.body.velocity.y > 800) {
+      this.player.setVelocityY(800);
+    }
+  }
 
   private setVelocity = (): void => {
     if (this.scene.getControl("left")?.control.isDown) {
@@ -118,11 +125,6 @@ export default class PlayerManager extends PhysicsManager {
       duration: 100,
       ease: "Linear",
       repeat: 5,
-    });
-
-    // When player is hit, call collision for all enemies
-    this.scene.enemyManager.getEnemies().children.each((enemy) => {
-      enemy.emit("collideWithPlayer", enemy);
     });
   };
 
