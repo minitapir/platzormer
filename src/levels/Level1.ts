@@ -4,7 +4,6 @@ import CheckpointManager from "../scenes/managers/CheckpointManager";
 import EndLevelManager from "../scenes/managers/EndLevelManager";
 import EnemyManager from "../scenes/managers/EnemyManager";
 import PlayerManager from "../scenes/managers/PlayerManager";
-import TimeBonusManager from "../scenes/managers/TimeBonusManager";
 
 export interface Control {
   name: string;
@@ -32,7 +31,6 @@ export default class Level1 extends Phaser.Scene {
   // Managers
   private playerManager!: PlayerManager;
   private enemyManager!: EnemyManager;
-  private timeBonusManager!: TimeBonusManager;
   private endLevelManager!: EndLevelManager;
   private checkpointManager!: CheckpointManager;
   private ability2Manager!: AbilityManager;
@@ -61,7 +59,6 @@ export default class Level1 extends Phaser.Scene {
     this.setupMap();
     this.setupManagers();
     this.setupCamera();
-    this.sound.add("boucle_game").setLoop(true).setVolume(0.3).play();
   };
 
   update = (time: number, delta: number): void => {
@@ -84,8 +81,6 @@ export default class Level1 extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/images/map1.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
-    this.load.image("transparent", "assets/images/transparent.png");
-    this.load.image("timeBonus", "assets/images/timeBonus.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
     this.load.image("power2", "assets/images/power2.png");
     this.load.image("power3", "assets/images/power3.png");
@@ -119,6 +114,9 @@ export default class Level1 extends Phaser.Scene {
       tileWidth: 32,
     }) as Tilemaps.Tilemap;
     let tileset = this.map.addTilesetImage("tileset", "tiles", 32, 32);
+    
+    // Music
+    this.sound.add("boucle_game").setLoop(true).setVolume(0.3).play();
 
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
@@ -145,9 +143,9 @@ export default class Level1 extends Phaser.Scene {
     });
     this.map.getObjectLayer("wallArrows").objects.forEach((arrowWall) => {
       const arrowWallObject = this.map?.createFromObjects("wallArrows", {
-        key: "transparent",
+        key: "tilesetSprite",
         id: arrowWall.id,
-        frame: 297,
+        frame: 297
       })[0] as Phaser.GameObjects.GameObject;
       this.arrowWalls.add(arrowWallObject);
     });
@@ -236,21 +234,6 @@ export default class Level1 extends Phaser.Scene {
       "collideWithPlayer",
       this.playerManager.checkpointReached,
       this.checkpointManager.collected
-    );
-
-    // Time Bonus
-    this.timeBonusManager = new TimeBonusManager(
-      this,
-      "timeBonus",
-      this.playerManager.player
-    );
-
-    this.timeBonusManager.addCollider(
-      this.playerManager.player.body.gameObject,
-      "collideWithTimeBonus",
-      "collideWithPlayer",
-      this.playerManager.timeBonusCollected,
-      this.timeBonusManager.collected
     );
 
     // Power 2

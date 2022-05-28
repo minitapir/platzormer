@@ -128,10 +128,6 @@ export default class PlayerManager extends PhysicsManager {
     });
   };
 
-  public timeBonusCollected = () => {
-    console.log("just hit the bonus");
-  };
-
   public win = () => {
     this.scene.scene.start("Level2");
   };
