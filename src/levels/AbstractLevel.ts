@@ -141,7 +141,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
 
     // Music
     if (this.sound.getAll("boucle_game").length === 0) {
-      this.sound.add("boucle_game").setLoop(true).setVolume(0.3).play();
+      this.sound.add("boucle_game").setLoop(true).setVolume(0.02).play();
     }
 
     // Colliders

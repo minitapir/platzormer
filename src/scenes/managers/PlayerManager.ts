@@ -200,7 +200,7 @@ export default class PlayerManager extends PhysicsManager {
     GameObjects.Sprite
   ]): void => {
     if (enemy.body.touching.up && this.currentAbility === 2) {
-      this.player.setVelocityY(-this.jumpStrength);
+      this.player.setVelocityY(-this.jumpStrength*1.5);
     } else {
       this.respawn();
     }
