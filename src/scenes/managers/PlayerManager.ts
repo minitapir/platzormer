@@ -4,7 +4,7 @@ import PhysicsManager from "./PhysicsManager";
 
 export default class PlayerManager extends PhysicsManager {
   public player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  private spawnPoint: Phaser.Math.Vector2;
+  public spawnPoint: Phaser.Math.Vector2;
   public playerSpeed: integer;
   public canJump: boolean;
   public currentJumpCount: integer;
@@ -206,8 +206,14 @@ export default class PlayerManager extends PhysicsManager {
     }
   };
 
-  public checkpointReached = () => {
-    console.log("checkpoint reached");
+  public checkpointReached = ([player, checkpoint]: [
+    GameObjects.Sprite,
+    GameObjects.Sprite
+  ]) => {
+    const checkpointX = checkpoint.getData("originPositionX");
+    const checkpointY = checkpoint.getData("originPositionY");
+    const newSpawnPoint = new Phaser.Math.Vector2(checkpointX, checkpointY);
+    this.spawnPoint = newSpawnPoint;
   };
 
   public unlockPower2 = () => {
