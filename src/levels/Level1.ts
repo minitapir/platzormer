@@ -61,6 +61,7 @@ export default class Level1 extends Phaser.Scene {
     this.setupMap();
     this.setupManagers();
     this.setupCamera();
+    this.sound.add("boucle_game").setLoop(true).setVolume(0.3).play();
   };
 
   update = (time: number, delta: number): void => {
@@ -83,10 +84,12 @@ export default class Level1 extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "assets/images/map1.json");
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
+    this.load.image("transparent", "assets/images/transparent.png");
     this.load.image("timeBonus", "assets/images/timeBonus.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
     this.load.image("power2", "assets/images/power2.png");
     this.load.image("power3", "assets/images/power3.png");
+    this.load.audio("boucle_game","assets/music/boucle_game.mp3");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -142,7 +145,7 @@ export default class Level1 extends Phaser.Scene {
     });
     this.map.getObjectLayer("wallArrows").objects.forEach((arrowWall) => {
       const arrowWallObject = this.map?.createFromObjects("wallArrows", {
-        key: "tilesetSprite",
+        key: "transparent",
         id: arrowWall.id,
         frame: 297,
       })[0] as Phaser.GameObjects.GameObject;
