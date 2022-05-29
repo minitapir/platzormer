@@ -12,6 +12,8 @@ export default class Level2 extends AbstractLevel {
     this.load.image("power3", "assets/images/power3.png");
   };
 
+  public override customSetupMap = () => {};
+
   public override customLevelManagers = () => {
     // Player already have power 2
     this.playerManager.unlockPower2();

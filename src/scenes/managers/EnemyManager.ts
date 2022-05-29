@@ -24,6 +24,7 @@ export default class EnemyManager extends PhysicsManager {
           .setOrigin(0, 0);
         // Add each enemy to the enemy group.
         this.group.add(enemyObject);
+        enemyObject.addListener("respawn", this.respawn);
       });
   }
 
@@ -83,11 +84,17 @@ export default class EnemyManager extends PhysicsManager {
     if (enemy.body.touching.up && this.playerManager.currentAbility === 2) {
       enemy.destroy();
     } else {
-      this.respawn(enemy);
+      // Reset is called by player event handler
     }
   };
 
-  public override respawn = (enemy: GameObjects.Sprite): void => {
+  public respawnAll = () => {
+    this.group.children.each((enemy) => {
+      enemy.emit("respawn", enemy);
+    });
+  };
+
+  protected override respawn = (enemy: GameObjects.Sprite): void => {
     enemy.setX(enemy.getData("originPositionX"));
     enemy.setY(enemy.getData("originPositionY"));
     enemy.body.setVelocity(0);
