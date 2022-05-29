@@ -10,13 +10,13 @@ export default class Home extends Phaser.Scene {
 
   public preload = () => {
     this.load.image("homeBackground", "assets/images/UI/splash_empty.png");
-    this.load.audio("boucle_game", "assets/music/boucle_game.mp3");
+    this.load.audio("boucle_menu", "assets/music/boucle_menu.mp3");
   };
   public create = () => {
     const { width, height } = this.scale;
     // Music
-    if (this.sound.getAll("boucle_game").length === 0) {
-      this.sound.add("boucle_game").setLoop(true).setVolume(0.02).play();
+    if (this.sound.getAll("boucle_menu").length === 0) {
+      this.sound.add("boucle_menu").setLoop(true).setVolume(0.1).play();
     }
 
     const bg = this.add.sprite(0, 0, "homeBackground").setOrigin(0, 0);
@@ -70,6 +70,7 @@ export default class Home extends Phaser.Scene {
   public update(time: number, delta: number): void {
     if (this.enter.isDown && this.input.keyboard.checkDown(this.enter, 100)) {
       this.scene.start("Level1");
+      this.sound.get("boucle_menu").stop();
     }
   }
 }
