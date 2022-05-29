@@ -17,7 +17,7 @@ export default class Endgame extends Phaser.Scene {
     const chronoText = this.add.text(
       width / 2,
       height / 2.1,
-      UI.chrono.toString(),
+      (this.scene.get("ui") as UI).chrono.toString(),
       {
         font: "50px Orbitron",
         padding: {

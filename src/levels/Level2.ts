@@ -47,9 +47,9 @@ export default class Level2 extends AbstractLevel {
     );
   };
   public endLevel = () => {
-    this.scene.stop('level2');
-    const ui = this.scene.get('ui') as UI;
+    const ui = this.scene.get("ui") as UI;
     ui.stopChrono();
-    this.scene.start('endgame');
+    ui.scene.stop();
+    this.scene.start("endgame");
   };
 }
