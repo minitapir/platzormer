@@ -84,6 +84,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+    // Idle
     this.load.spritesheet(
       "playerIdleGreen",
       "assets/images/animSpritesheets/Idle/green.png",
@@ -114,6 +115,39 @@ export default abstract class AbstractLevel extends Phaser.Scene {
         endFrame: 15,
       }
     );
+
+    // Jump
+    this.load.spritesheet(
+      "playerJumpGreen",
+      "assets/images/animSpritesheets/Jump/green.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerJumpBlue",
+      "assets/images/animSpritesheets/Jump/blue.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerJumpRed",
+      "assets/images/animSpritesheets/Jump/red.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+
     this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,

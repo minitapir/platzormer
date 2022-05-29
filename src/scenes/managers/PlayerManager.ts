@@ -63,11 +63,16 @@ export default class PlayerManager extends PhysicsManager {
     this.hasPower = [true, false, false]; // By default, has only climb power
 
     // Animations
-    const characters = ["playerIdleGreen", "playerIdleBlue", "playerIdleRed"];
-    characters.forEach((character, index) => {
+    // Idle
+    const idleAnimations = [
+      "playerIdleGreen",
+      "playerIdleBlue",
+      "playerIdleRed",
+    ];
+    idleAnimations.forEach((animation, index) => {
       this.scene.anims.create({
-        key: character,
-        frames: this.player.anims.generateFrameNumbers(character, {
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
           start: 0,
           end: 15,
         }),
@@ -76,7 +81,26 @@ export default class PlayerManager extends PhysicsManager {
         yoyo: true,
       });
     });
-    this.player.play("playerIdleGreen", true);
+    this.player.play(this.getIdleAnimation(), true);
+
+    // Jump
+    const jumpAnimations = [
+      "playerJumpGreen",
+      "playerJumpBlue",
+      "playerJumpRed",
+    ];
+    jumpAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 6,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
   }
 
   public update = (delta: number): void => {
@@ -96,12 +120,14 @@ export default class PlayerManager extends PhysicsManager {
   private handleJump = (): void => {
     if (this.player.body.blocked.down) {
       this.currentJumpCount = this.jumpMax;
+      this.player.play(this.getIdleAnimation(), true);
     }
     if (
       this.scene.getControl("jump")?.control.isDown &&
       this.currentJumpCount > 0 &&
       this.canJump
     ) {
+      this.player.play(this.getJumpAnimation(), true);
       //si Z est appuyé, que la var jump est encore utilisable et que le joueur peut sauter,
       //alors il a le droit à un autre saut et saute
       this.currentJumpCount--;
@@ -111,6 +137,26 @@ export default class PlayerManager extends PhysicsManager {
     if (this.scene.getControl("jump")?.control.isUp) {
       //lorsque la touche Z n'est plus appuyée, alors il remplit une des conditions pour sauter de nouveau
       this.canJump = true;
+    }
+  };
+
+  private getIdleAnimation = (): string => {
+    if (this.currentAbility === 0) {
+      return "playerIdleGreen";
+    } else if (this.currentAbility === 1) {
+      return "playerIdleBlue";
+    } else {
+      return "playerIdleRed";
+    }
+  };
+
+  private getJumpAnimation = (): string => {
+    if (this.currentAbility === 0) {
+      return "playerJumpGreen";
+    } else if (this.currentAbility === 1) {
+      return "playerJumpBlue";
+    } else {
+      return "playerJumpRed";
     }
   };
 
