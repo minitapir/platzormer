@@ -63,14 +63,20 @@ export default class PlayerManager extends PhysicsManager {
     this.hasPower = [true, false, false]; // By default, has only climb power
 
     // Animations
-    const characters = ["yellow", "purple", "blue"];
-    characters.forEach((character, index) =>
+    const characters = ["yellow"];
+    characters.forEach((character, index) => {
       this.scene.anims.create({
         key: character,
-        frames: [{ key: "player", frame: index }],
-        frameRate: 20,
-      })
-    );
+        frames: this.player.anims.generateFrameNumbers(name, {
+          start: 0,
+          end: 15,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+    this.player.play("yellow", true);
   }
 
   public update = (delta: number): void => {
@@ -123,19 +129,19 @@ export default class PlayerManager extends PhysicsManager {
     } else {
       this.player.setVelocityX(0);
     }
-    this.player.anims.play("yellow");
     this.terminalVelocityCheck();
   };
 
   // Abilities
   private handleAbility = (delta: number): void => {
+    let abilityChange = false;
     this.timeSinceLastAbilityChange += delta;
     if (this.scene.getControl("action")?.control.isDown) {
       this.nextAbility();
     }
 
-    if (this.currentAbility === 0) {
-      this.player.anims.play("yellow");
+    if (this.currentAbility === 0 && abilityChange) {
+      console.log("playing yellow animation");
     }
 
     if (this.currentAbility === 1) {

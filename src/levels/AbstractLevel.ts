@@ -84,10 +84,16 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
-    this.load.spritesheet("player", "assets/images/charac.png", {
-      frameWidth: 32,
-      frameHeight: 64,
-    });
+    this.load.spritesheet(
+      "player",
+      "assets/images/animSpritesheets/idle_64_512.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 15,
+      }
+    );
     this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,
