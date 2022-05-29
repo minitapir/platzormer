@@ -48,6 +48,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
     this.arrowSpeed = 250;
+    
   }
 
   preload = (): void => {
