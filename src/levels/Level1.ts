@@ -48,6 +48,7 @@ export default class Level1 extends AbstractLevel {
   };
 
   public endLevel = () => {
+    this.scene.stop("Level1");
     this.scene.start("Level2");
   };
 }

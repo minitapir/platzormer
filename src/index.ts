@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import config from "./config";
 import Level1 from "./levels/Level1";
 import Level2 from "./levels/Level2";
-import UI from "./ui/ui";
+import UI from "./ui/UI";
 
 new Phaser.Game(
   Object.assign(config, {

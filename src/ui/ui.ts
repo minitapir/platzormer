@@ -31,4 +31,8 @@ export default class UI extends Phaser.Scene {
   };
 
   public update(time: number, delta: number): void {}
+
+  public stopChrono = () => {
+    this.time.paused = true;
+  };
 }
