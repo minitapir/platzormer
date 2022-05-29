@@ -101,6 +101,36 @@ export default class PlayerManager extends PhysicsManager {
         yoyo: true,
       });
     });
+
+    // Walk
+    const walkAnimations = ["playerWalkGreen", "playerWalkRed"];
+    walkAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 6,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+
+    // Run
+    const runAnimations = ["playerRunBlue"];
+    runAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 3,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
   }
 
   public update = (delta: number): void => {
@@ -120,7 +150,6 @@ export default class PlayerManager extends PhysicsManager {
   private handleJump = (): void => {
     if (this.player.body.blocked.down) {
       this.currentJumpCount = this.jumpMax;
-      this.player.play(this.getIdleAnimation(), true);
     }
     if (
       this.scene.getControl("jump")?.control.isDown &&
@@ -160,18 +189,43 @@ export default class PlayerManager extends PhysicsManager {
     }
   };
 
+  private getMoveAnimation = (): string => {
+    if (this.player.body.blocked.down) {
+      if (this.currentAbility === 0) {
+        return "playerWalkGreen";
+      } else if (this.currentAbility === 1) {
+        return "playerRunBlue";
+      } else {
+        return "playerWalkRed";
+      }
+    }
+    return this.player.anims.getName();
+  };
+
   private terminalVelocityCheck = (): void => {
-    if (this.player.body.velocity.y > 800) {
-      this.player.setVelocityY(800);
+    if (this.player.body.velocity.y != 0) {
+      if (!this.player.anims.getName().includes("Jump")) {
+        this.player.play(this.getJumpAnimation(), true);
+      }
+      if (this.player.body.velocity.y > 800) {
+        this.player.setVelocityY(800);
+      }
     }
   };
 
   private setVelocity = (): void => {
     if (this.scene.getControl("left")?.control.isDown) {
       this.player.setVelocityX(-this.playerSpeed);
+      this.player.setFlipX(true);
+      this.player.play(this.getMoveAnimation(), true);
     } else if (this.scene.getControl("right")?.control.isDown) {
       this.player.setVelocityX(this.playerSpeed);
+      this.player.setFlipX(false);
+      this.player.play(this.getMoveAnimation(), true);
     } else {
+      if (this.player.body.velocity.y === 0) {
+        this.player.play(this.getIdleAnimation(), true);
+      }
       this.player.setVelocityX(0);
     }
     this.terminalVelocityCheck();
@@ -193,7 +247,6 @@ export default class PlayerManager extends PhysicsManager {
       this.player.play(
         {
           key: "playerIdleGreen",
-          //startFrame: this.player.anims.currentFrame.nextFrame.index,
         },
         true
       );
@@ -203,7 +256,6 @@ export default class PlayerManager extends PhysicsManager {
       this.player.play(
         {
           key: "playerIdleBlue",
-          //startFrame: this.player.anims.currentFrame.nextFrame.index,
         },
         true
       );
@@ -268,6 +320,7 @@ export default class PlayerManager extends PhysicsManager {
    */
   protected override respawn = (): void => {
     this.currentAbility = 0;
+    this.jumpMax = 1;
     this.player.setVelocity(0, 0);
     this.player.setX(this.spawnPoint.x);
     this.player.setY(this.spawnPoint.y);
@@ -287,6 +340,7 @@ export default class PlayerManager extends PhysicsManager {
   ]): void => {
     if (enemy.body.touching.up && this.currentAbility === 2) {
       this.player.setVelocityY(-this.jumpStrength * 1.5);
+      this.player.play(this.getJumpAnimation(), true);
     } else {
       this.scene.events.emit("reset");
     }

@@ -148,6 +148,40 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       }
     );
 
+    // Walk
+    this.load.spritesheet(
+      "playerWalkGreen",
+      "assets/images/animSpritesheets/Walk/green.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerWalkRed",
+      "assets/images/animSpritesheets/Walk/red.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+
+    // Run (only blue)
+    this.load.spritesheet(
+      "playerRunBlue",
+      "assets/images/animSpritesheets/Run/blue.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 3,
+      }
+    );
+
     this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,
