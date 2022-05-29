@@ -1,5 +1,6 @@
 import { GameObjects } from "phaser";
 import GameScene from "../../levels/Level1";
+import UI from "../../ui/ui";
 import PhysicsManager from "./PhysicsManager";
 
 export default class PlayerManager extends PhysicsManager {
@@ -216,7 +217,7 @@ export default class PlayerManager extends PhysicsManager {
     if (enemy.body.touching.up && this.currentAbility === 2) {
       this.player.setVelocityY(-this.jumpStrength * 1.5);
     } else {
-      this.scene.events.emit('reset');
+      this.scene.events.emit("reset");
     }
   };
 
