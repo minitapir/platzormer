@@ -31,7 +31,7 @@ export default class PlayerManager extends PhysicsManager {
     );
 
     this.player = this.scene.physics.add
-      .sprite(this.spawnPoint.x, this.spawnPoint.y, this.name)
+      .sprite(this.spawnPoint.x, this.spawnPoint.y, "playerIdleGreen")
       .setOrigin(0, 0);
 
     this.player.addListener("respawn", this.respawn);
@@ -63,11 +63,11 @@ export default class PlayerManager extends PhysicsManager {
     this.hasPower = [true, false, false]; // By default, has only climb power
 
     // Animations
-    const characters = ["yellow"];
+    const characters = ["playerIdleGreen", "playerIdleBlue", "playerIdleRed"];
     characters.forEach((character, index) => {
       this.scene.anims.create({
         key: character,
-        frames: this.player.anims.generateFrameNumbers(name, {
+        frames: this.player.anims.generateFrameNumbers(character, {
           start: 0,
           end: 15,
         }),
@@ -76,7 +76,7 @@ export default class PlayerManager extends PhysicsManager {
         yoyo: true,
       });
     });
-    this.player.play("yellow", true);
+    this.player.play("playerIdleGreen", true);
   }
 
   public update = (delta: number): void => {
