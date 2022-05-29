@@ -13,8 +13,17 @@ export default class UI extends Phaser.Scene {
 
   public create = () => {
     this.currentChronoText = this.add.text(10, 10, "Chrono : ", {
-      font: "25px Orbitron",
-      fill: "#000000",
+      font: "30px Orbitron",
+      padding: {
+        right: 10,
+      },
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: "#097A70",
+        stroke: true,
+        fill: true,
+      },
     });
 
     this.chronoEvent = this.time.addEvent({
