@@ -84,10 +84,104 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
-    this.load.spritesheet("player", "assets/images/charac.png", {
-      frameWidth: 32,
-      frameHeight: 64,
-    });
+    // Idle
+    this.load.spritesheet(
+      "playerIdleGreen",
+      "assets/images/animSpritesheets/Idle/green.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 15,
+      }
+    );
+    this.load.spritesheet(
+      "playerIdleBlue",
+      "assets/images/animSpritesheets/Idle/blue.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 15,
+      }
+    );
+    this.load.spritesheet(
+      "playerIdleRed",
+      "assets/images/animSpritesheets/Idle/red.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 15,
+      }
+    );
+
+    // Jump
+    this.load.spritesheet(
+      "playerJumpGreen",
+      "assets/images/animSpritesheets/Jump/green.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerJumpBlue",
+      "assets/images/animSpritesheets/Jump/blue.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerJumpRed",
+      "assets/images/animSpritesheets/Jump/red.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+
+    // Walk
+    this.load.spritesheet(
+      "playerWalkGreen",
+      "assets/images/animSpritesheets/Walk/green.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+    this.load.spritesheet(
+      "playerWalkRed",
+      "assets/images/animSpritesheets/Walk/red.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 6,
+      }
+    );
+
+    // Run (only blue)
+    this.load.spritesheet(
+      "playerRunBlue",
+      "assets/images/animSpritesheets/Run/blue.png",
+      {
+        frameWidth: 32,
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 3,
+      }
+    );
+
     this.load.spritesheet("ghost", "assets/images/ghost.png", {
       frameWidth: 32,
       frameHeight: 64,

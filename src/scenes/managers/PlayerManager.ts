@@ -31,7 +31,7 @@ export default class PlayerManager extends PhysicsManager {
     );
 
     this.player = this.scene.physics.add
-      .sprite(this.spawnPoint.x, this.spawnPoint.y, this.name)
+      .sprite(this.spawnPoint.x, this.spawnPoint.y, "playerIdleGreen")
       .setOrigin(0, 0);
 
     this.player.addListener("respawn", this.respawn);
@@ -63,14 +63,74 @@ export default class PlayerManager extends PhysicsManager {
     this.hasPower = [true, false, false]; // By default, has only climb power
 
     // Animations
-    const characters = ["yellow", "purple", "blue"];
-    characters.forEach((character, index) =>
+    // Idle
+    const idleAnimations = [
+      "playerIdleGreen",
+      "playerIdleBlue",
+      "playerIdleRed",
+    ];
+    idleAnimations.forEach((animation, index) => {
       this.scene.anims.create({
-        key: character,
-        frames: [{ key: "player", frame: index }],
-        frameRate: 20,
-      })
-    );
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 15,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+    this.player.play(this.getIdleAnimation(), true);
+
+    // Jump
+    const jumpAnimations = [
+      "playerJumpGreen",
+      "playerJumpBlue",
+      "playerJumpRed",
+    ];
+    jumpAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 6,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+
+    // Walk
+    const walkAnimations = ["playerWalkGreen", "playerWalkRed"];
+    walkAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 6,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+
+    // Run
+    const runAnimations = ["playerRunBlue"];
+    runAnimations.forEach((animation, index) => {
+      this.scene.anims.create({
+        key: animation,
+        frames: this.player.anims.generateFrameNumbers(animation, {
+          start: 0,
+          end: 3,
+        }),
+        frameRate: 10,
+        repeat: -1,
+        yoyo: true,
+      });
+    });
   }
 
   public update = (delta: number): void => {
@@ -91,12 +151,12 @@ export default class PlayerManager extends PhysicsManager {
     if (this.player.body.blocked.down) {
       this.currentJumpCount = this.jumpMax;
     }
-
     if (
       this.scene.getControl("jump")?.control.isDown &&
       this.currentJumpCount > 0 &&
       this.canJump
     ) {
+      this.player.play(this.getJumpAnimation(), true);
       //si Z est appuyé, que la var jump est encore utilisable et que le joueur peut sauter,
       //alors il a le droit à un autre saut et saute
       this.currentJumpCount--;
@@ -109,49 +169,113 @@ export default class PlayerManager extends PhysicsManager {
     }
   };
 
+  private getIdleAnimation = (): string => {
+    if (this.currentAbility === 0) {
+      return "playerIdleGreen";
+    } else if (this.currentAbility === 1) {
+      return "playerIdleBlue";
+    } else {
+      return "playerIdleRed";
+    }
+  };
+
+  private getJumpAnimation = (): string => {
+    if (this.currentAbility === 0) {
+      return "playerJumpGreen";
+    } else if (this.currentAbility === 1) {
+      return "playerJumpBlue";
+    } else {
+      return "playerJumpRed";
+    }
+  };
+
+  private getMoveAnimation = (): string => {
+    if (this.player.body.blocked.down) {
+      if (this.currentAbility === 0) {
+        return "playerWalkGreen";
+      } else if (this.currentAbility === 1) {
+        return "playerRunBlue";
+      } else {
+        return "playerWalkRed";
+      }
+    }
+    return this.player.anims.getName();
+  };
+
   private terminalVelocityCheck = (): void => {
-    if (this.player.body.velocity.y > 800) {
-      this.player.setVelocityY(800);
+    if (this.player.body.velocity.y != 0) {
+      if (!this.player.anims.getName().includes("Jump")) {
+        this.player.play(this.getJumpAnimation(), true);
+      }
+      if (this.player.body.velocity.y > 800) {
+        this.player.setVelocityY(800);
+      }
     }
   };
 
   private setVelocity = (): void => {
     if (this.scene.getControl("left")?.control.isDown) {
       this.player.setVelocityX(-this.playerSpeed);
+      this.player.setFlipX(true);
+      this.player.play(this.getMoveAnimation(), true);
     } else if (this.scene.getControl("right")?.control.isDown) {
       this.player.setVelocityX(this.playerSpeed);
+      this.player.setFlipX(false);
+      this.player.play(this.getMoveAnimation(), true);
     } else {
+      if (this.player.body.velocity.y === 0) {
+        this.player.play(this.getIdleAnimation(), true);
+      }
       this.player.setVelocityX(0);
     }
-    this.player.anims.play("yellow");
     this.terminalVelocityCheck();
   };
 
   // Abilities
   private handleAbility = (delta: number): void => {
+    let abilityChange = false;
     this.timeSinceLastAbilityChange += delta;
     if (this.scene.getControl("action")?.control.isDown) {
       this.nextAbility();
+      abilityChange = true;
     }
 
-    if (this.currentAbility === 0) {
-      this.player.anims.play("yellow");
+    if (this.currentAbility === 0 && abilityChange) {
+      this.playerSpeed = 300;
+      this.jumpMax = 1;
+      this.jumpStrength = 450;
+      this.player.play(
+        {
+          key: "playerIdleGreen",
+        },
+        true
+      );
     }
 
-    if (this.currentAbility === 1) {
-      this.player.anims.play("blue");
+    if (this.currentAbility === 1 && abilityChange) {
+      this.player.play(
+        {
+          key: "playerIdleBlue",
+        },
+        true
+      );
 
       this.playerSpeed = 500;
       this.jumpMax = 2;
       this.jumpStrength = 500;
-    } else {
+    }
+
+    if (this.currentAbility === 2 && abilityChange) {
       this.playerSpeed = 300;
       this.jumpMax = 1;
       this.jumpStrength = 450;
-    }
-
-    if (this.currentAbility === 2) {
-      this.player.anims.play("purple");
+      this.player.play(
+        {
+          key: "playerIdleRed",
+          //startFrame: this.player.anims.currentFrame.nextFrame.index,
+        },
+        true
+      );
     }
   };
 
@@ -196,6 +320,7 @@ export default class PlayerManager extends PhysicsManager {
    */
   protected override respawn = (): void => {
     this.currentAbility = 0;
+    this.jumpMax = 1;
     this.player.setVelocity(0, 0);
     this.player.setX(this.spawnPoint.x);
     this.player.setY(this.spawnPoint.y);
@@ -215,6 +340,7 @@ export default class PlayerManager extends PhysicsManager {
   ]): void => {
     if (enemy.body.touching.up && this.currentAbility === 2) {
       this.player.setVelocityY(-this.jumpStrength * 1.5);
+      this.player.play(this.getJumpAnimation(), true);
     } else {
       this.scene.events.emit("reset");
     }
