@@ -104,12 +104,10 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.preloadLevelAssets();
   };
 
-  public abstract preloadLevelAssets: () => void;
-
   /**
    * This method handles background and map creation.
    */
-  protected setupMap = (): void => {
+  private setupMap = (): void => {
     this.add.image(0, 0, "background").setOrigin(0, 0).setScrollFactor(0, 0);
     this.map = this.make.tilemap({
       key: this.mapKey,
@@ -147,6 +145,8 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
     ground.layer.setCollisionByExclusion([-1]);
+
+    this.events.addListener("reset", this.reset);
 
     // Background
     this.map.createLayer("background", tileset);
@@ -195,9 +195,10 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       })[0] as Phaser.GameObjects.GameObject;
       this.spikes.add(spikeObject);
     });
+    this.customSetupMap();
   };
 
-  protected setupManagers = (): void => {
+  private setupManagers = (): void => {
     // Colliders
     this.colliders.forEach((collider) => {
       this.physics.add.collider(
@@ -223,14 +224,14 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.physics.add.collider(
       this.playerManager.player,
       this.spikes,
-      this.playerManager.respawn
+      this.reset
     );
 
     // Arrows
     this.physics.add.collider(
       this.playerManager.player,
       this.arrows,
-      this.playerManager.respawn
+      this.reset
     );
 
     // Enemies
@@ -254,13 +255,16 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.customLevelManagers();
   };
 
-  public abstract customLevelManagers: () => void;
-  public abstract endLevel: () => void;
-
   protected setupCamera = (): void => {
     let cam = this.cameras.main.setBounds(0, 0, 1920, 4460);
     cam.setZoom(1);
     cam.startFollow(this.playerManager.player);
+  };
+
+  private reset = () => {
+    this.playerManager.player.emit("respawn");
+    this.enemyManager.respawnAll();
+    this.resetArrows();
   };
 
   /**
@@ -291,4 +295,16 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       arrow.setVelocityX(-this.arrowSpeed);
     });
   };
+
+  private resetArrows = (): void => {
+    this.arrows.children.getArray().forEach((arrow) => {
+      arrow.destroy();
+    });
+  };
+
+  // Abstract methods to override
+  protected abstract preloadLevelAssets: () => void;
+  protected abstract customSetupMap: () => void;
+  protected abstract customLevelManagers: () => void;
+  protected abstract endLevel: () => void;
 }

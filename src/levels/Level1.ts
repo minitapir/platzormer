@@ -15,6 +15,8 @@ export default class Level1 extends AbstractLevel {
     this.load.image("power2", "assets/images/power2.png");
   };
 
+  public override customSetupMap = () => {};
+
   public override customLevelManagers = () => {
     // Power 2
     this.abilityManager = this.abilityManager = new AbilityManager(

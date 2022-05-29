@@ -19,5 +19,5 @@ export default abstract class PhysicsManager {
     collidedCallback: () => void
   ) => void;
 
-  public abstract respawn: (sprite: GameObjects.Sprite) => void;
+  protected abstract respawn: (sprite: GameObjects.Sprite) => void;
 }

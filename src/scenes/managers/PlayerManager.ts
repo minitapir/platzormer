@@ -34,6 +34,20 @@ export default class PlayerManager extends PhysicsManager {
       .sprite(this.spawnPoint.x, this.spawnPoint.y, this.name)
       .setOrigin(0, 0);
 
+    this.player.addListener("respawn", this.respawn);
+
+    // Detect out of map
+    this.scene.events.on("update", () => {
+      if (
+        this.player.body.x < 0 ||
+        this.player.body.x > this.scene.map.widthInPixels ||
+        this.player.body.y < 0 ||
+        this.player.body.y > this.scene.map.heightInPixels
+      ) {
+        this.scene.events.emit("reset");
+      }
+    });
+
     // Player settings
     this.playerSpeed = 300;
     this.canJump = true;
@@ -180,7 +194,7 @@ export default class PlayerManager extends PhysicsManager {
   /**
    * When player is hit, reset.
    */
-  public override respawn = (): void => {
+  protected override respawn = (): void => {
     this.currentAbility = 0;
     this.player.setVelocity(0, 0);
     this.player.setX(this.spawnPoint.x);
@@ -200,9 +214,9 @@ export default class PlayerManager extends PhysicsManager {
     GameObjects.Sprite
   ]): void => {
     if (enemy.body.touching.up && this.currentAbility === 2) {
-      this.player.setVelocityY(-this.jumpStrength*1.5);
+      this.player.setVelocityY(-this.jumpStrength * 1.5);
     } else {
-      this.respawn();
+      this.scene.events.emit('reset');
     }
   };
 
