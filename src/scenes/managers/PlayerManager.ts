@@ -97,7 +97,6 @@ export default class PlayerManager extends PhysicsManager {
     if (this.player.body.blocked.down) {
       this.currentJumpCount = this.jumpMax;
     }
-
     if (
       this.scene.getControl("jump")?.control.isDown &&
       this.currentJumpCount > 0 &&
@@ -138,26 +137,47 @@ export default class PlayerManager extends PhysicsManager {
     this.timeSinceLastAbilityChange += delta;
     if (this.scene.getControl("action")?.control.isDown) {
       this.nextAbility();
+      abilityChange = true;
     }
 
     if (this.currentAbility === 0 && abilityChange) {
-      console.log("playing yellow animation");
+      this.playerSpeed = 300;
+      this.jumpMax = 1;
+      this.jumpStrength = 450;
+      this.player.play(
+        {
+          key: "playerIdleGreen",
+          //startFrame: this.player.anims.currentFrame.nextFrame.index,
+        },
+        true
+      );
     }
 
-    if (this.currentAbility === 1) {
-      this.player.anims.play("blue");
+    if (this.currentAbility === 1 && abilityChange) {
+      this.player.play(
+        {
+          key: "playerIdleBlue",
+          //startFrame: this.player.anims.currentFrame.nextFrame.index,
+        },
+        true
+      );
 
       this.playerSpeed = 500;
       this.jumpMax = 2;
       this.jumpStrength = 500;
-    } else {
+    }
+
+    if (this.currentAbility === 2 && abilityChange) {
       this.playerSpeed = 300;
       this.jumpMax = 1;
       this.jumpStrength = 450;
-    }
-
-    if (this.currentAbility === 2) {
-      this.player.anims.play("purple");
+      this.player.play(
+        {
+          key: "playerIdleRed",
+          //startFrame: this.player.anims.currentFrame.nextFrame.index,
+        },
+        true
+      );
     }
   };
 
