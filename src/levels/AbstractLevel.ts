@@ -80,7 +80,6 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.load.image("tiles", "assets/images/tileset.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
     this.load.image("power3", "assets/images/power3.png");
-    this.load.audio("boucle_game", "assets/music/boucle_game.mp3");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -136,11 +135,6 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.controls.push({ name: "left", control: q });
     this.controls.push({ name: "right", control: d });
     this.controls.push({ name: "action", control: a });
-
-    // Music
-    if (this.sound.getAll("boucle_game").length === 0) {
-      this.sound.add("boucle_game").setLoop(true).setVolume(0.02).play();
-    }
 
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));

@@ -1,6 +1,5 @@
 import { GameObjects } from "phaser";
 import GameScene from "../../levels/Level1";
-import UI from "../../ui/UI";
 import PhysicsManager from "./PhysicsManager";
 
 export default class PlayerManager extends PhysicsManager {

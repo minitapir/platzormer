@@ -1,5 +1,6 @@
 import AbilityManager from "../scenes/managers/AbilityManager";
 import EndLevelManager from "../scenes/managers/EndLevelManager";
+import UI from "../ui/UI";
 import AbstractLevel from "./AbstractLevel";
 
 export default class Level1 extends AbstractLevel {
@@ -45,10 +46,12 @@ export default class Level1 extends AbstractLevel {
       "collideWithPlayer",
       this.endLevel
     );
+    const ui = this.scene.get("ui") as UI;
+    ui.scene.start();
+    ui.startChrono();
   };
 
   public endLevel = () => {
-    this.scene.stop("Level1");
     this.scene.start("Level2");
   };
 }
