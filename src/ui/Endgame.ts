@@ -14,10 +14,11 @@ export default class Endgame extends Phaser.Scene {
     bg.setOrigin(0, 0);
     bg.setDisplaySize(width, height);
 
+    const timer = (this.scene.get("ui") as UI).chrono;
     const chronoText = this.add.text(
       width / 2,
-      height / 2.1,
-      (this.scene.get("ui") as UI).chrono.toString(),
+      height / 2.2,
+      this.millisToMinutesAndSeconds(timer),
       {
         font: "50px Orbitron",
         padding: {
@@ -34,5 +35,13 @@ export default class Endgame extends Phaser.Scene {
     );
 
     chronoText.setOrigin(0.5, 1);
+  };
+
+  public millisToMinutesAndSeconds = (millis: number) => {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    //ES6 interpolated literals/template literals
+    //If seconds is less than 10 put a zero in front.
+    return `${minutes}:${+seconds < 10 ? "0" : ""}${seconds}`;
   };
 }
