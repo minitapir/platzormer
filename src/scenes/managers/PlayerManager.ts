@@ -52,7 +52,7 @@ export default class PlayerManager extends PhysicsManager {
     this.playerSpeed = 300;
     this.canJump = true;
     this.jumpStrength = 450;
-    this.jumpMax = 2;
+    this.jumpMax = 1;
     this.currentJumpCount = this.jumpMax;
 
     // Abilities

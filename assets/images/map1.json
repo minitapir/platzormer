@@ -569,9 +569,88 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":32,
+         "name":"helpText",
+         "objects":[
+                {
+                 "height":96,
+                 "id":135,
+                 "name":"move",
+                 "properties":[
+                        {
+                         "name":"text",
+                         "type":"string",
+                         "value":"Q, D to move"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":224,
+                 "x":64,
+                 "y":4160
+                }, 
+                {
+                 "height":128,
+                 "id":136,
+                 "name":"jump",
+                 "properties":[
+                        {
+                         "name":"text",
+                         "type":"string",
+                         "value":"Space to jump"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":224,
+                 "x":896,
+                 "y":4128
+                }, 
+                {
+                 "height":224,
+                 "id":137,
+                 "name":"climb",
+                 "properties":[
+                        {
+                         "name":"text",
+                         "type":"string",
+                         "value":"Hold Q or D\n to climb"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":1728,
+                 "y":4032
+                }, 
+                {
+                 "height":96,
+                 "id":140,
+                 "name":"doubleJump",
+                 "properties":[
+                        {
+                         "name":"text",
+                         "type":"string",
+                         "value":"You can now sprint double jump !"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":1408,
+                 "y":2720
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":32,
- "nextobjectid":133,
+ "nextlayerid":33,
+ "nextobjectid":141,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.8.2",
