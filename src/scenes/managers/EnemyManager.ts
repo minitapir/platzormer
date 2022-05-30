@@ -41,6 +41,11 @@ export default class EnemyManager extends PhysicsManager {
           this.playerManager.player,
           this.enemySpeed
         );
+        if (enemy.body.position.x > this.playerManager.player.body.position.x) {
+          enemy.setFlipX(false);
+        } else {
+          enemy.setFlipX(true);
+        }
       } else {
         enemy.body.setVelocity(
           Math.max(enemy.body.velocity.x - 0.5, 0),
