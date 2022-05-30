@@ -28,6 +28,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
   protected arrowWalls!: Phaser.Physics.Arcade.Group;
   protected arrows!: Phaser.Physics.Arcade.Group;
   protected controls: Control[];
+  protected texts: GameObjects.Text[];
 
   // Managers
   protected playerManager!: PlayerManager;
@@ -45,6 +46,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     super(name);
     this.controls = [];
     this.colliders = [];
+    this.texts = [];
     this.timeSinceLastArrowFired = 0;
     this.arrowSpawnDelay = 1000;
     this.arrowSpeed = 250;
@@ -289,6 +291,55 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       })[0] as Phaser.GameObjects.GameObject;
       this.spikes.add(spikeObject);
     });
+
+    // Help texts
+    const textsPhysics = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    this.map.getObjectLayer("helpText").objects.forEach((text, i) => {
+      const textObject = this.add
+        .rectangle(text.x, text.y, text.width, text.height)
+        .setOrigin(0.75, 0)
+        .setData("index", i);
+      const textToAdd = this.add.text(
+        text.x,
+        text.y,
+        text.properties[0].value,
+        {
+          font: "25px Arial",
+        }
+      );
+      textToAdd.setAlpha(0);
+      this.texts.push(textToAdd);
+      this.physics.add.overlap(
+        this.playerManager.player,
+        textObject,
+        (player, text) => {
+          const textIndex = text.getData("index") as integer;
+          this.tweens.add({
+            targets: this.texts[textIndex],
+            alpha: 1,
+            ease: "Power1",
+            duration: 1000,
+            onComplete: () => {
+              this.tweens.add({
+                targets: this.texts[textIndex],
+                alpha: 0,
+                ease: "Power1",
+                duration: 1000,
+                onComplete: () => {
+                  this.texts[textIndex].setAlpha(0);
+                },
+              });
+            },
+          });
+        }
+      );
+      textsPhysics.add(textObject);
+    });
+
+    // Levels can add their own logic
     this.customSetupMap();
   };
 
