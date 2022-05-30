@@ -1,6 +1,7 @@
 import UI from "./UI";
-
 export default class Endgame extends Phaser.Scene {
+  private enter!: Phaser.Input.Keyboard.Key;
+
   constructor() {
     super("endgame");
   }
@@ -35,6 +36,29 @@ export default class Endgame extends Phaser.Scene {
     );
 
     chronoText.setOrigin(0.5, 1);
+
+    var retry = this.add.text(
+      width / 2,
+      height / 1.1,
+      "Appuyez sur Entrée pour revenir au menu principal",
+      {
+        font: "50px Orbitron",
+        padding: {
+          right: 10,
+        },
+        shadow: {
+          offsetX: 2,
+          offsetY: 2,
+          color: "#097A70",
+          stroke: true,
+          fill: true,
+        },
+      }
+    );
+    retry.setOrigin(0.5, 1);
+    this.enter = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ENTER
+    );
   };
 
   public millisToMinutesAndSeconds = (millis: number) => {
@@ -43,5 +67,13 @@ export default class Endgame extends Phaser.Scene {
     //ES6 interpolated literals/template literals
     //If seconds is less than 10 put a zero in front.
     return `${minutes}:${+seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  public update = () => {
+    if (this.enter.isDown && this.input.keyboard.checkDown(this.enter, 100)) {
+      this.scene.start("home");
+      this.sound.get("boucle_game").stop();
+      this.sound.get("boucle_menu").play();
+    }
   };
 }
