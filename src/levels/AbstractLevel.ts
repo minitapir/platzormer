@@ -199,6 +199,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.preloadLevelAssets();
 
     this.load.audio("boucle_game", "assets/music/boucle_game.mp3");
+    this.load.audio("fireArrow", "assets/music/arrow.mp3");
   };
 
   /**
@@ -212,6 +213,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       tileWidth: 32,
     }) as Tilemaps.Tilemap;
     let tileset = this.map.addTilesetImage("tileset", "tiles", 32, 32);
+
     // Music
     if (this.sound.getAll("boucle_game").length === 0) {
       this.sound.add("boucle_game").setLoop(true).setVolume(0.02).play();
@@ -428,6 +430,9 @@ export default abstract class AbstractLevel extends Phaser.Scene {
             "arrows",
             1
           ) as GameObjects.Sprite;
+          this.sound.play("fireArrow",{
+            volume: 0.1
+          });
         }
       });
       this.timeSinceLastArrowFired = 0;
