@@ -414,7 +414,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
 
   protected setupCamera = (): void => {
     let cam = this.cameras.main.setBounds(0, 0, 1920, 4460);
-    cam.setZoom(1);
+    cam.setZoom(1.5);
     cam.startFollow(this.playerManager.player);
   };
 
