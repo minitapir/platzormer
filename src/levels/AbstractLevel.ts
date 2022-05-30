@@ -279,6 +279,16 @@ export default abstract class AbstractLevel extends Phaser.Scene {
       allowGravity: false,
       immovable: false,
     });
+    // Arrows animation
+    this.anims.create({
+      key: "arrow",
+      frames: this.anims.generateFrameNumbers("arrows", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
     // Spikes
     this.spikes = this.physics.add.group({
@@ -430,9 +440,10 @@ export default abstract class AbstractLevel extends Phaser.Scene {
             "arrows",
             1
           ) as GameObjects.Sprite;
-          this.sound.play("fireArrow",{
-            volume: 0.1
+          this.sound.play("fireArrow", {
+            volume: 0.1,
           });
+          newArrow.play("arrow", true);
         }
       });
       this.timeSinceLastArrowFired = 0;
