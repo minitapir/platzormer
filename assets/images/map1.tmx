@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="33" nextobjectid="142">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="60" height="136" tilewidth="32" tileheight="32" infinite="0" nextlayerid="33" nextobjectid="145">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
@@ -224,7 +224,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,198,200,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,134,135,136,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,3,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -473,10 +473,7 @@
   <object id="7" name="power2" gid="417" x="1408" y="2814.67" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="22" name="ghost">
-  <object id="46" x="1688" y="2686.67">
-   <point/>
-  </object>
-  <object id="47" x="75.333" y="2329.33">
+  <object id="47" x="192" y="2336">
    <point/>
   </object>
   <object id="48" x="1136" y="2112">
@@ -493,30 +490,45 @@
   </object>
  </objectgroup>
  <objectgroup id="32" name="helpText">
-  <object id="135" name="move" x="64" y="4160" width="224" height="96">
+  <object id="135" name="move" x="65.1232" y="4127.65" width="302.627" height="129.697">
    <properties>
-    <property name="text" value="Q, D to move"/>
+    <property name="text">Appuyez sur Q ou D
+pour avancer</property>
    </properties>
   </object>
   <object id="136" name="jump" x="896" y="4128" width="224" height="128">
    <properties>
-    <property name="text" value="Space to jump"/>
+    <property name="text" value="Sautez avec Espace"/>
    </properties>
   </object>
-  <object id="137" name="climb" x="1728" y="4032" width="128" height="224">
+  <object id="137" name="climb" x="1632.3" y="4063" width="223.7" height="192.999">
    <properties>
-    <property name="text">Hold Q or D
- to climb</property>
+    <property name="text">Maintenez Q ou D
+pour escalader</property>
    </properties>
   </object>
-  <object id="140" name="doubleJump" x="928" y="2656" width="128" height="96">
+  <object id="140" name="doubleJump" x="870.041" y="2626.35" width="311.313" height="156.655">
    <properties>
-    <property name="text" value="You can now sprint double jump !"/>
+    <property name="text">Vous pouvez maintenant courir
+ et faire des double sauts</property>
    </properties>
   </object>
-  <object id="141" name="newCapacity" x="1376" y="2720" width="96" height="96">
+  <object id="141" name="newCapacity" x="1376" y="2658" width="96" height="158.003">
    <properties>
-    <property name="text" value="Use J to switch personality"/>
+    <property name="text">Appuyez sur J pour
+changer de personnalité</property>
+   </properties>
+  </object>
+  <object id="142" name="kill" x="419.496" y="2339.39" width="184.262" height="152.611">
+   <properties>
+    <property name="text">Vous pouvez éliminer les fantômes
+en leur sautant dessus</property>
+   </properties>
+  </object>
+  <object id="143" name="respawn" x="1248" y="3201" width="96" height="127.001">
+   <properties>
+    <property name="text">Point de réapparition
+débloqué !</property>
    </properties>
   </object>
  </objectgroup>

@@ -56,19 +56,15 @@ export default class PlayerManager extends PhysicsManager {
     this.currentJumpCount = this.jumpMax;
 
     // Abilities
-    this.abilitiesCount = 3;
+    this.abilitiesCount = 2;
     this.currentAbility = 0;
     this.abilityChangeDelay = 200;
     this.timeSinceLastAbilityChange = 0;
-    this.hasPower = [true, false, false]; // By default, has only climb power
+    this.hasPower = [true, false]; // By default, has only climb power
 
     // Animations
     // Idle
-    const idleAnimations = [
-      "playerIdleGreen",
-      "playerIdleBlue",
-      "playerIdleRed",
-    ];
+    const idleAnimations = ["playerIdleGreen", "playerIdleBlue"];
     idleAnimations.forEach((animation, index) => {
       this.scene.anims.create({
         key: animation,
@@ -84,11 +80,7 @@ export default class PlayerManager extends PhysicsManager {
     this.player.play(this.getIdleAnimation(), true);
 
     // Jump
-    const jumpAnimations = [
-      "playerJumpGreen",
-      "playerJumpBlue",
-      "playerJumpRed",
-    ];
+    const jumpAnimations = ["playerJumpGreen", "playerJumpBlue"];
     jumpAnimations.forEach((animation, index) => {
       this.scene.anims.create({
         key: animation,
@@ -103,7 +95,7 @@ export default class PlayerManager extends PhysicsManager {
     });
 
     // Walk
-    const walkAnimations = ["playerWalkGreen", "playerWalkRed"];
+    const walkAnimations = ["playerWalkGreen"];
     walkAnimations.forEach((animation, index) => {
       this.scene.anims.create({
         key: animation,
@@ -172,20 +164,16 @@ export default class PlayerManager extends PhysicsManager {
   private getIdleAnimation = (): string => {
     if (this.currentAbility === 0) {
       return "playerIdleGreen";
-    } else if (this.currentAbility === 1) {
-      return "playerIdleBlue";
     } else {
-      return "playerIdleRed";
+      return "playerIdleBlue";
     }
   };
 
   private getJumpAnimation = (): string => {
     if (this.currentAbility === 0) {
       return "playerJumpGreen";
-    } else if (this.currentAbility === 1) {
-      return "playerJumpBlue";
     } else {
-      return "playerJumpRed";
+      return "playerJumpBlue";
     }
   };
 
@@ -193,10 +181,8 @@ export default class PlayerManager extends PhysicsManager {
     if (this.player.body.blocked.down) {
       if (this.currentAbility === 0) {
         return "playerWalkGreen";
-      } else if (this.currentAbility === 1) {
-        return "playerRunBlue";
       } else {
-        return "playerWalkRed";
+        return "playerRunBlue";
       }
     }
     return this.player.anims.getName();
@@ -264,19 +250,6 @@ export default class PlayerManager extends PhysicsManager {
       this.jumpMax = 2;
       this.jumpStrength = 500;
     }
-
-    if (this.currentAbility === 2 && abilityChange) {
-      this.playerSpeed = 300;
-      this.jumpStrength = 450;
-      this.jumpMax = 1;
-      this.player.play(
-        {
-          key: "playerIdleRed",
-          //startFrame: this.player.anims.currentFrame.nextFrame.index,
-        },
-        true
-      );
-    }
   };
 
   /**
@@ -340,7 +313,7 @@ export default class PlayerManager extends PhysicsManager {
     GameObjects.Sprite,
     GameObjects.Sprite
   ]): void => {
-    if (enemy.body.touching.up && this.currentAbility === 2) {
+    if (enemy.body.touching.up) {
       this.player.setVelocityY(-this.jumpStrength * 1.5);
       this.player.play(this.getJumpAnimation(), true);
     } else {
@@ -360,9 +333,5 @@ export default class PlayerManager extends PhysicsManager {
 
   public unlockPower2 = () => {
     this.hasPower[1] = true;
-  };
-
-  public unlockPower3 = () => {
-    this.hasPower[2] = true;
   };
 }

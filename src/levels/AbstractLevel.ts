@@ -81,7 +81,6 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.load.image("background", "assets/images/background.png");
     this.load.image("tiles", "assets/images/tileset.png");
     this.load.image("checkpoints", "assets/images/checkpoints.png");
-    this.load.image("power3", "assets/images/power3.png");
     this.load.spritesheet("tilesetSprite", "assets/images/tileset.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -100,16 +99,6 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.load.spritesheet(
       "playerIdleBlue",
       "assets/images/animSpritesheets/Idle/blue.png",
-      {
-        frameWidth: 32,
-        frameHeight: 64,
-        startFrame: 0,
-        endFrame: 15,
-      }
-    );
-    this.load.spritesheet(
-      "playerIdleRed",
-      "assets/images/animSpritesheets/Idle/red.png",
       {
         frameWidth: 32,
         frameHeight: 64,
@@ -139,31 +128,11 @@ export default abstract class AbstractLevel extends Phaser.Scene {
         endFrame: 6,
       }
     );
-    this.load.spritesheet(
-      "playerJumpRed",
-      "assets/images/animSpritesheets/Jump/red.png",
-      {
-        frameWidth: 32,
-        frameHeight: 64,
-        startFrame: 0,
-        endFrame: 6,
-      }
-    );
 
     // Walk
     this.load.spritesheet(
       "playerWalkGreen",
       "assets/images/animSpritesheets/Walk/green.png",
-      {
-        frameWidth: 32,
-        frameHeight: 64,
-        startFrame: 0,
-        endFrame: 6,
-      }
-    );
-    this.load.spritesheet(
-      "playerWalkRed",
-      "assets/images/animSpritesheets/Walk/red.png",
       {
         frameWidth: 32,
         frameHeight: 64,
@@ -312,7 +281,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     this.map.getObjectLayer("helpText").objects.forEach((text, i) => {
       const textObject = this.add
         .rectangle(text.x, text.y, text.width, text.height)
-        .setOrigin(0.75, 0)
+        .setOrigin(0, 0)
         .setData("index", i);
       const textToAdd = this.add.text(
         text.x,
@@ -320,6 +289,7 @@ export default abstract class AbstractLevel extends Phaser.Scene {
         text.properties[0].value,
         {
           font: "25px Arial",
+          align: "center",
         }
       );
       textToAdd.setAlpha(0);

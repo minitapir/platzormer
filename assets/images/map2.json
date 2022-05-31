@@ -1061,24 +1061,7 @@
          "draworder":"topdown",
          "id":33,
          "name":"helpText",
-         "objects":[
-                {
-                 "height":96,
-                 "id":213,
-                 "name":"kill",
-                 "properties":[
-                        {
-                         "name":"text",
-                         "type":"string",
-                         "value":"You can now defeat ghosts by jumping on them !"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":160,
-                 "x":1248,
-                 "y":3008
-                }],
+         "objects":[],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,

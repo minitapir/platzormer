@@ -86,7 +86,7 @@ export default class EnemyManager extends PhysicsManager {
     GameObjects.Sprite,
     GameObjects.Sprite
   ]): void => {
-    if (enemy.body.touching.up && this.playerManager.currentAbility === 2) {
+    if (enemy.body.touching.up) {
       enemy.destroy();
     } else {
       // Reset is called by player event handler

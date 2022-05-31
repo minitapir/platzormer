@@ -18,20 +18,7 @@ export default class Level2 extends AbstractLevel {
   public override customLevelManagers = () => {
     // Player already have power 2
     this.playerManager.unlockPower2();
-    // Power 3
-    this.abilityManager = this.abilityManager = new AbilityManager(
-      this,
-      "power3",
-      this.playerManager.player
-    );
-    this.abilityManager.addCollider(
-      this.playerManager.player.body.gameObject,
-      "collideWithPower2",
-      "collideWithPlayer",
-      this.playerManager.unlockPower3,
-      this.abilityManager.collected
-    );
-
+    
     // End level
     this.endLevelManager = new EndLevelManager(
       this,
