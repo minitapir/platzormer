@@ -1,3 +1,7 @@
+import config from "../config";
+import Level1 from "../levels/Level1";
+import Level2 from "../levels/Level2";
+import Home from "./Home";
 import UI from "./UI";
 export default class Endgame extends Phaser.Scene {
   private enter!: Phaser.Input.Keyboard.Key;
@@ -71,9 +75,12 @@ export default class Endgame extends Phaser.Scene {
 
   public update = () => {
     if (this.enter.isDown && this.input.keyboard.checkDown(this.enter, 100)) {
-      this.scene.start("home");
-      this.sound.get("boucle_game").stop();
-      this.sound.get("boucle_menu").play();
+      this.sys.game.destroy(true);
+      new Phaser.Game(
+        Object.assign(config, {
+          scene: [Home, Level1, Level2, Endgame, UI],
+        })
+      );
     }
   };
 }
