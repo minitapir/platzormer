@@ -267,8 +267,8 @@ export default class PlayerManager extends PhysicsManager {
 
     if (this.currentAbility === 2 && abilityChange) {
       this.playerSpeed = 300;
-      this.jumpMax = 1;
       this.jumpStrength = 450;
+      this.jumpMax = 1;
       this.player.play(
         {
           key: "playerIdleRed",
@@ -321,6 +321,8 @@ export default class PlayerManager extends PhysicsManager {
   protected override respawn = (): void => {
     this.currentAbility = 0;
     this.jumpMax = 1;
+    this.playerSpeed = 300;
+    this.jumpStrength = 450;
     this.player.setVelocity(0, 0);
     this.player.setX(this.spawnPoint.x);
     this.player.setY(this.spawnPoint.y);

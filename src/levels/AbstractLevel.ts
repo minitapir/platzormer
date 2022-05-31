@@ -234,11 +234,11 @@ export default abstract class AbstractLevel extends Phaser.Scene {
     );
     const q = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     const d = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    const a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    const j = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
     this.controls.push({ name: "jump", control: space });
     this.controls.push({ name: "left", control: q });
     this.controls.push({ name: "right", control: d });
-    this.controls.push({ name: "action", control: a });
+    this.controls.push({ name: "action", control: j });
 
     // Colliders
     const ground = new Collider(this.map.createLayer("ground", tileset));
