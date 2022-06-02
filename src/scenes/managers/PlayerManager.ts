@@ -36,18 +36,6 @@ export default class PlayerManager extends PhysicsManager {
 
     this.player.addListener("respawn", this.respawn);
 
-    // Detect out of map
-    this.scene.events.on("update", () => {
-      if (
-        this.player.body.x < 0 ||
-        this.player.body.x > this.scene.map.widthInPixels ||
-        this.player.body.y < 0 ||
-        this.player.body.y > this.scene.map.heightInPixels
-      ) {
-        this.scene.events.emit("reset");
-      }
-    });
-
     // Player settings
     this.playerSpeed = 300;
     this.canJump = true;
@@ -200,21 +188,33 @@ export default class PlayerManager extends PhysicsManager {
   };
 
   private setVelocity = (): void => {
-    if (this.scene.getControl("left")?.control.isDown) {
-      this.player.setVelocityX(-this.playerSpeed);
-      this.player.setFlipX(true);
-      this.player.play(this.getMoveAnimation(), true);
-    } else if (this.scene.getControl("right")?.control.isDown) {
-      this.player.setVelocityX(this.playerSpeed);
-      this.player.setFlipX(false);
-      this.player.play(this.getMoveAnimation(), true);
+    if (this.player.body.y < 0) {
+      this.player.body.y = this.scene.map.heightInPixels;
+    } else if (this.player.body.y > this.scene.map.heightInPixels) {
+      this.scene.events.emit("reset");
+    } else if (this.player.body.x < 0) {
+      this.player.body.stop();
+      this.player.body.position.x = 0;
+    } else if (this.player.body.x > this.scene.map.widthInPixels - 32) {
+      this.player.body.stop();
+      this.player.body.position.x = this.scene.map.widthInPixels - 32;
     } else {
-      if (this.player.body.velocity.y === 0) {
-        this.player.play(this.getIdleAnimation(), true);
+      if (this.scene.getControl("left")?.control.isDown) {
+        this.player.setVelocityX(-this.playerSpeed);
+        this.player.setFlipX(true);
+        this.player.play(this.getMoveAnimation(), true);
+      } else if (this.scene.getControl("right")?.control.isDown) {
+        this.player.setVelocityX(this.playerSpeed);
+        this.player.setFlipX(false);
+        this.player.play(this.getMoveAnimation(), true);
+      } else {
+        if (this.player.body.velocity.y === 0) {
+          this.player.play(this.getIdleAnimation(), true);
+        }
+        this.player.setVelocityX(0);
       }
-      this.player.setVelocityX(0);
+      this.terminalVelocityCheck();
     }
-    this.terminalVelocityCheck();
   };
 
   // Abilities
